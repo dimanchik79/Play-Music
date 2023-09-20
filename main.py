@@ -9,23 +9,27 @@ def main():
     root.title("MUSIC PLAYER")
     root.geometry("450x500")
     root.resizable(False, False)
+    root.configure(fg_color="dark slate grey")
 
-    frame_main = CTkFrame(root, height=100, width=440, border_width=1, border_color="black")
-    frame_main.place_configure(x=5, y=5, bordermode="inside")
+    frame_main = CTkFrame(root, height=100, width=440, border_width=1, fg_color="dark slate grey")
+    frame_main.place_configure(x=5, y=5, bordermode="inside",)
     frame_main.place()
 
-    frame_progress = CTkFrame(root, height=35, width=250, border_width=1, border_color="black")
+    frame_progress = CTkFrame(root, height=35, width=250, border_width=1, border_color="white",
+                              fg_color="dark slate grey")
     frame_progress.place_configure(x=5, y=110, bordermode="inside")
     frame_progress.place()
 
-    frame_volume = CTkFrame(root, height=35, width=103, border_width=1, border_color="black")
+    frame_volume = CTkFrame(root, height=35, width=103, border_width=1, border_color="white",
+                            fg_color="dark slate grey")
     frame_volume.place_configure(x=342, y=110, bordermode="inside")
     frame_volume.place()
-    lbl = CTkLabel(frame_volume, text="volume", font=("Calibri", 9), height=8)
-    lbl.place_configure(x=5, y=5)
+    lbl = CTkLabel(frame_volume, text="volume", font=("Calibri", 9), height=8, fg_color="white", width=93,
+                   text_color="black")
+    lbl.place_configure(x=5, y=4)
     lbl.place()
 
-    frame_list = CTkFrame(root, height=300, width=440, border_width=1, border_color="black")
+    frame_list = CTkFrame(root, height=300, width=440, border_width=1, border_color="black", fg_color="dark slate grey")
     frame_list.place_configure(x=5, y=150, bordermode="inside")
     frame_list.place()
 
