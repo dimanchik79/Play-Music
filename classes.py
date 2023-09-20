@@ -85,7 +85,7 @@ class MainClass:
             threading.Thread(target=self.file_add, args=(), daemon=True).start()
 
     def file_add(self):
-
+        pass
 
     def press_stop_button(self):
         self.start = False
