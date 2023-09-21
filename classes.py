@@ -30,7 +30,11 @@ class MainClass:
         self.pause = False
         self.start = False
         self.x_pos = 2
-
+        self.duration = None
+        self.song_id = None
+        self.next_song = 0
+        self.total_songs = 0
+        
         # кнопка play
         img = CTkImage(light_image=Image.open("IMG/play.ico"), size=(24, 24))
         self.btn_play = CTkButton(self.root[1], image=img, text="", width=24, height=24,
@@ -134,11 +138,12 @@ class MainClass:
         self.btn_play.update()
         pygame.mixer.music.stop()
         
-
     def press_play_button(self):
         if not self.start:
             self.start = True
             path = self.playlist[int(self.tree.selection()[0])][1]
+            self.duration = self.playlist[int(self.tree.selection()[0])][3]
+            self.song_id = str(self.tree.selection()[0])
             pygame.mixer.music.load(path)
             pygame.mixer.music.set_volume(self.slider_volume.get() / 100)
             pygame.mixer.music.play(loops=0)
@@ -153,13 +158,18 @@ class MainClass:
             threading.Thread(target=self.play_music, args=(), daemon=True).start()
 
     def play_music(self):
-        while True:
+        while get_time(pygame.mixer.music.get_pos()) != self.duration:
             if self.pause or not self.start:
                 return
+            self.tree.tag_configure('pink', foreground='pink')
+            self.tree.item(self.song_id, tag='pink')
+            self.tree.set(self.song_id, 1, get_time(pygame.mixer.music.get_pos()))
             self.x_pos += 1
             self.btn_play.place_configure(x=self.x_pos)
             self.btn_play.update()
             time.sleep(0.4)
+        pygame.mixer.music.stop()
+        
 
     def update_playlist(self):
         if self.tree.selection() != ():
@@ -170,4 +180,16 @@ class MainClass:
                 self.tree.insert("", END, iid=str(row.id), values=(row.song_name, row.duration))
             self.playlist[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec]
         
-
+    def play_time_duration():
+        # 
+        #     run_string_news()
+        #     if get_flags("addplay") == 1:
+        #         t
+        #     pygame.mixer.music.set_volume(volume_scale.get() / 100)
+        #     progress.config(value=pygame.mixer.music.get_pos())
+        #     progress.update()
+        #     label_time.config(text=get_time(pygame.mixer.music.get_pos()), fg="black")
+        #     label_time.update()
+        # set_flags('music_play', 0)
+        # next_song()
+        pass
