@@ -1,10 +1,26 @@
 from tkinter.ttk import Treeview
 from PIL import Image
 from customtkinter import *
-from tkinter import ttk, font, filedialog
+from tkinter.filedialog import askopenfilenames
+from tkinter import ttk, font
 from models import PlayList
+from tinytag import TinyTag
 import threading
 import time
+import pygame
+
+
+pygame.mixer.init()
+
+
+def get_time(duration):
+    duration /= 1000
+    if duration < 0:
+        return
+    second = f"{0}{int(duration % 60)}"
+    minute = '00' if (duration % 60) == 0 else f"{0}{int(duration / 60)}"
+    hour = '00' if (duration % 3600) == 0 else f"{0}{int(duration / 3600)}"
+    return f"{hour:}:{minute}:{second[0:] if len(second) < 3 else second[1:]}"
 
 
 class MainClass:
@@ -60,16 +76,16 @@ class MainClass:
         # список tree
         style = ttk.Style()
         style.theme_use("clam")
-        font.nametofont('TkHeadingFont').configure(size=10)
+        font.nametofont('TkHeadingFont').configure(family="Calibri", size=10)
         style.configure(".", font=('Calibri', 10, "roman"), foreground="black")
         columns = ("name_song", "time_song")
-        self.tree = Treeview(self.root[3], name="tree", columns=columns, show="headings", height=13, padding=5)
-        ttk.Style().configure("Treeview", foreground="#BAF300", fieldbackground="dark slate grey")
+        self.tree = Treeview(self.root[3], name="tree", columns=columns, show="headings", height=13, padding=2)
+        ttk.Style().configure("Treeview", background="black", foreground="white", fieldbackground="black")
         self.tree.pack(side=LEFT)
         self.tree.heading("name_song", text="Song`s name", anchor=W)
         self.tree.heading("time_song", text="Time", anchor=W)
-        self.tree.column("#1", stretch=NO, width=330, anchor=W)
-        self.tree.column("#2", stretch=NO, width=80, anchor=E)
+        self.tree.column("#1", stretch=NO, width=348, anchor=W)
+        self.tree.column("#2", stretch=NO, width=70, anchor=E)
         # tree.bind("<Return>", keypress_tree_change_song)
         # tree.bind("<Double-ButtonPress-1>", keypress_tree_change_song)
         scrollbar = ttk.Scrollbar(self.root[3], orient=VERTICAL, command=self.tree.yview)
@@ -85,8 +101,30 @@ class MainClass:
             threading.Thread(target=self.file_add, args=(), daemon=True).start()
 
     def file_add(self):
-        pass
-
+        allowed_extensions = ('.mp3', '.wav', ".mp4", '.avi')
+        song_files = []
+        songs = list(askopenfilenames())
+        for element in songs:
+            for ext in allowed_extensions:
+                if element.find(ext) != -1:
+                    song_files += (element, )
+                    break
+        if song_files == "":
+            return
+        
+        for song_file in song_files:
+            song = TinyTag.get(song_file)
+            if song.artist != None:
+                song.artist.replace('[', "(").replace("]", ")")
+            text_name = f"{song.title} -> {song.artist}"
+            if "None" in text_name:
+                text_name = song_file[song_file.rindex("/") + 1:]
+            text_time = f"{get_time(song.duration * 1000)}"
+            PlayList.create(song_name = text_name, 
+                            song_path = song_file,
+                            duration = text_time,
+                            duration_sec = song.duration)
+            
     def press_stop_button(self):
         self.start = False
         self.pause = False
@@ -94,13 +132,18 @@ class MainClass:
         self.btn_play.configure(image=CTkImage(light_image=Image.open("IMG/play.ico"), size=(24, 24)))
         self.btn_play.place_configure(x=self.x_pos)
         self.btn_play.update()
+        pygame.mixer.music.stop()
+        
 
     def press_play_button(self):
         if not self.start:
             self.start = True
+            path = self.playlist[int(self.tree.selection()[0])][1]
+            pygame.mixer.music.load(path)
+            pygame.mixer.music.set_volume(self.slider_volume.get() / 100)
+            pygame.mixer.music.play(loops=0)
             threading.Thread(target=self.play_music, args=(), daemon=True).start()
             return
-
         if self.start and not self.pause:
             self.btn_play.configure(image=CTkImage(light_image=Image.open("IMG/pause.ico"), size=(24, 24)))
             self.pause = True
@@ -122,8 +165,9 @@ class MainClass:
         if self.tree.selection() != ():
             for delete_row in self.tree.get_children():
                 self.tree.delete(delete_row)
-
         for row in PlayList.select():
+            if os.path.exists(f"{row.song_path}"):
+                self.tree.insert("", END, iid=str(row.id), values=(row.song_name, row.duration))
             self.playlist[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec]
-        print(self.playlist)
+        
 
