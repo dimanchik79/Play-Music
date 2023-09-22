@@ -55,7 +55,6 @@ class MainClass:
         # бегунок slider
         self.slider_volume = CTkSlider(self.root[2], from_=0, to=100, height=12, width=95)
         self.slider_volume.place_configure(x=5, y=17)
-        self.slider_volume.place()
 
         # кнопка add
         img = CTkImage(light_image=Image.open("IMG/add.ico"), size=(24, 24))

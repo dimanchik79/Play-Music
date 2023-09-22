@@ -16,22 +16,18 @@ def main():
 
     frame_main = CTkFrame(root, height=100, width=440, border_width=1, fg_color=color[1], border_color="white")
     frame_main.place_configure(x=5, y=5)
-    frame_main.place()
 
     frame_progress = CTkFrame(root, height=35, width=250, border_width=1, border_color="white", fg_color=color[1])
     frame_progress.place_configure(x=5, y=110)
-    frame_progress.place()
 
     frame_volume = CTkFrame(root, height=35, width=103, border_width=1, border_color="white", fg_color=color[1])
     frame_volume.place_configure(x=342, y=110)
     frame_volume.place()
     lbl = CTkLabel(frame_volume, text="volume", font=("Calibri", 9), height=8, fg_color="white", width=93, text_color="black")
     lbl.place_configure(x=5, y=4)
-    lbl.place()
 
     frame_list = CTkFrame(root, height=300, width=440, border_width=1, border_color="black", fg_color=color[1])
     frame_list.place_configure(x=5, y=150)
-    frame_list.place()
 
     all_widget = MainClass(root=[root, frame_progress, frame_volume, frame_list])
 
