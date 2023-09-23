@@ -31,10 +31,12 @@ class MainClass:
         self.start = False
         self.x_pos = 2
         self.duration = None
+        self.duretion_sec = None
         self.duratoin_old = None
         self.song_id = None
         self.song_id_old = None
         self.total_songs = 0
+        self.wait = 0
         
         # кнопка play
         img = CTkImage(light_image=Image.open("IMG/play.ico"), size=(24, 24))
@@ -158,7 +160,10 @@ class MainClass:
         if not self.start:
             self.start = True
             path = self.playlist[int(self.tree.selection()[0])][1]
-            self.duration = self.playlist[int(self.tree.selection()[0])][3]
+            self.duration = self.playlist[int(self.tree.selection()[0])][2]
+            self.duration_sec = self.playlist[int(self.tree.selection()[0])][3]
+            self.wait = int((self.duration_sec * 100 / 250) / 10)
+            print(self.wait)
             
             if self.song_id_old != None:
                 self.tree.tag_configure('white', foreground='white')
@@ -170,7 +175,6 @@ class MainClass:
             self.duratoin_old = self.playlist[int(self.tree.selection()[0])][2]     
             self.tree.tag_configure('pink', foreground='pink')
             self.tree.item(self.song_id, tag='pink')
-            
             pygame.mixer.music.load(path)
             pygame.mixer.music.play(loops=0)
             for thred in threading.enumerate():
@@ -189,20 +193,20 @@ class MainClass:
             self.pause = False
             pygame.mixer.music.unpause()
             threading.Thread(target=self.play_music, args=(), daemon=True).start()
-
+    
     def play_music(self):
         while get_time(pygame.mixer.music.get_pos()) != self.duration:
             if self.pause or not self.start:
                 return
             pygame.mixer.music.set_volume(self.slider_volume.get() / 100)
             self.tree.set(self.song_id, 1, get_time(pygame.mixer.music.get_pos()))
-            self.x_pos += 1
-            self.btn_play.place_configure(x=self.x_pos)
-            self.btn_play.update()
-            time.sleep(0.4)
+            if (pygame.mixer.music.get_pos() % self.wait) == 0:
+                self.x_pos += 1
+                self.btn_play.place_configure(x=self.x_pos)
+                self.btn_play.update()
+        
         pygame.mixer.music.stop()
         
-
     def update_playlist(self):
         if self.tree.selection() != ():
             for delete_row in self.tree.get_children():
