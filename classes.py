@@ -200,7 +200,7 @@ class MainClass:
                 return
             pygame.mixer.music.set_volume(self.slider_volume.get() / 100)
             self.tree.set(self.song_id, 1, get_time(pygame.mixer.music.get_pos()))
-            if (pygame.mixer.music.get_pos() % self.wait) == 0:
+            if (pygame.mixer.music.get_pos() // self.wait) == 0:
                 self.x_pos += 1
                 self.btn_play.place_configure(x=self.x_pos)
                 self.btn_play.update()
