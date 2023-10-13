@@ -37,7 +37,6 @@ class MainClass(QMainWindow):
 
         uic.loadUi("player.ui", self)
         
-        
         self.playlist.setHeaderLabels(['Song','Time'])
         
         self.add.clicked.connect(self.file_add)
