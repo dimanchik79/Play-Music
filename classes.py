@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 from tinytag import TinyTag
 from models import PlayList
+import threading
 
 import pygame
 
@@ -37,11 +38,11 @@ class MainClass(QMainWindow):
 
         uic.loadUi("player.ui", self)
         
-        self.playlist.setHeaderLabels(['Song','Time'])
-        
         self.add.clicked.connect(self.file_add)
         self.play.clicked.connect(self.press_play_button)
         self.stop.clicked.connect(self.press_stop_button)
+        
+        self.update_playlist()
     
         
     def bind_tree_change_song(self, event):
@@ -69,70 +70,70 @@ class MainClass(QMainWindow):
     def press_stop_button(self):
         self.start = False
         self.pause = False
-        # self.btn_play.configure(image=CTkImage(light_image=Image.open("IMG/play.ico"), size=(24, 24)))
-        # self.btn_play.place_configure(x=self.x_pos)
-        # self.btn_play.update()
+        self.progress.setMaximum(0)
+        self.progress.setFormat("00:00:00")
+        self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
+        self.play.setIconSize(QtCore.QSize(28,28))
         pygame.mixer.music.stop()
         
     def press_play_button(self):
-        # if not self.start:
-            # self.start = True
-            # path = self.playlist[int(self.tree.selection()[0])][1]
-            # self.duration = self.playlist[int(self.tree.selection()[0])][2]
-            # self.duration_sec = self.playlist[int(self.tree.selection()[0])][3]
-            # self.wait = self.duration_sec / 250
-            # print(self.wait)
-            
-            # if self.song_id_old != None:
-            #     self.tree.tag_configure('white', foreground='white')
-            #     self.tree.item(self.song_id_old, tag='white')
-            #     self.tree.set(self.song_id, 1, self.duratoin_old)
-            
-            # self.song_id = str(self.tree.selection()[0])
-            # self.song_id_old = self.song_id
-            # self.duratoin_old = self.playlist[int(self.tree.selection()[0])][2]     
-            # self.tree.tag_configure('pink', foreground='pink')
-            # self.tree.item(self.song_id, tag='pink')
-            # pygame.mixer.music.load(path)
-            # pygame.mixer.music.play(loops=0)
-            # for thred in threading.enumerate():
-            #     if "play_music" in str(thred):
-            #         return
-            # else:
-            #     threading.Thread(target=self.play_music, args=(), daemon=True).start()
-            #     return
-        
-        if not self.pause:
+        if not self.start:
+            self.start = True
             self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
             self.play.setIconSize(QtCore.QSize(28,28))
-            self.pause = True
-            # pygame.mixer.music.pause()
-        else:
+            index = self.playlist.currentIndex().row()
+            
+            for key, word in self.play_list.items():
+                if word[0] == self.playlist.currentItem().text()[:-10]:
+                    path = self.play_list[key][1]
+                    self.duration = self.play_list[key][2]
+                    self.duration_sec = self.play_list[key][3]
+            
+            self.progress.setMaximum(int(self.duration_sec * 1000))
+            self.progress.setMinimum(0)
+            
+            if self.song_id_old != None:
+                self.playlist.item(self.song_id_old).setForeground(QtGui.QColor('black'))
+            
+            self.song_id = index
+            self.song_id_old = self.song_id 
+            self.playlist.item(index).setForeground(QtGui.QColor('blue'))
+            
+            pygame.mixer.music.load(path)
+            pygame.mixer.music.play(loops=0)
+            
+            for thred in threading.enumerate():
+                if "play_music" in str(thred):
+                    return
+            else:
+                threading.Thread(target=self.play_music, args=(), daemon=True).start()
+                return
+        
+        if not self.pause:
             self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
             self.play.setIconSize(QtCore.QSize(28,28))
+            self.pause = True
+            pygame.mixer.music.pause()
+        else:
+            self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
+            self.play.setIconSize(QtCore.QSize(28,28))
             self.pause = False
-            # pygame.mixer.music.unpause()
-            # threading.Thread(target=self.play_music, args=(), daemon=True).start()
+            pygame.mixer.music.unpause()
+            threading.Thread(target=self.play_music, args=(), daemon=True).start()
     
     def play_music(self):
         while get_time(pygame.mixer.music.get_pos()) != self.duration:
             if self.pause or not self.start:
                 return
-            pygame.mixer.music.set_volume(self.slider_volume.get() / 100)
-            # self.tree.set(self.song_id, 1, get_time(pygame.mixer.music.get_pos()))
-            # time.sleep(self.wait)
-            # self.x_pos += 1
-            self.btn_play.place_configure(x=self.x_pos)
-            self.btn_play.update()
-        
+            pygame.mixer.music.set_volume(self.volume.value() / 100)
+            self.progress.setValue(pygame.mixer.music.get_pos())
+            self.progress.setFormat(get_time(pygame.mixer.music.get_pos()))
         pygame.mixer.music.stop()
         
     def update_playlist(self):
-        if self.tree.selection() != ():
-            for delete_row in self.tree.get_children():
-                self.tree.delete(delete_row)
+        self.playlist.clear()
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
-                self.tree.insert("", END, iid=str(row.id), values=(row.song_name, row.duration))
-            self.playlist[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec]
+                self.playlist.addItem(f"{row.song_name}, {row.duration}")
+            self.play_list[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec]
         

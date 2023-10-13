@@ -120,7 +120,7 @@
    <widget class="QProgressBar" name="progress">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>55</x>
       <y>200</y>
       <width>221</width>
       <height>23</height>
@@ -320,7 +320,7 @@
      </size>
     </property>
    </widget>
-   <widget class="QTreeWidget" name="playlist">
+   <widget class="QListWidget" name="playlist">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -329,49 +329,6 @@
       <height>371</height>
      </rect>
     </property>
-    <attribute name="headerDefaultSectionSize">
-     <number>310</number>
-    </attribute>
-    <column>
-     <property name="text">
-      <string>Song</string>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="foreground">
-      <brush brushstyle="NoBrush">
-       <color alpha="255">
-        <red>85</red>
-        <green>0</green>
-        <blue>255</blue>
-       </color>
-      </brush>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Time</string>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="foreground">
-      <brush brushstyle="NoBrush">
-       <color alpha="255">
-        <red>85</red>
-        <green>0</green>
-        <blue>255</blue>
-       </color>
-      </brush>
-     </property>
-    </column>
    </widget>
   </widget>
  </widget>
