@@ -42,10 +42,13 @@ class MainClass(QMainWindow):
         self.play.clicked.connect(self.press_play_button)
         self.stop.clicked.connect(self.press_stop_button)
         
+        self.playlist.doubleClicked.connect(self.bind_tree_change_song)
+        
         self.update_playlist()
+        self.playlist.setFocus()
     
         
-    def bind_tree_change_song(self, event):
+    def bind_tree_change_song(self):
         self.press_stop_button()
         self.press_play_button()
 
@@ -70,17 +73,18 @@ class MainClass(QMainWindow):
     def press_stop_button(self):
         self.start = False
         self.pause = False
-        self.progress.setMaximum(0)
-        self.progress.setFormat("00:00:00")
+        self.progress.setValue(0)
         self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
         self.play.setIconSize(QtCore.QSize(28,28))
         pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
         
     def press_play_button(self):
         if not self.start:
             self.start = True
             self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
             self.play.setIconSize(QtCore.QSize(28,28))
+            
             index = self.playlist.currentIndex().row()
             
             for key, word in self.play_list.items():
@@ -103,10 +107,11 @@ class MainClass(QMainWindow):
             pygame.mixer.music.play(loops=0)
             
             for thred in threading.enumerate():
-                if "play_music" in str(thred):
+                if "play_music" in thred.name:
                     return
             else:
                 threading.Thread(target=self.play_music, args=(), daemon=True).start()
+                threading.Thread(target=self.set_volume, args=(), daemon=True).start()
                 return
         
         if not self.pause:
@@ -120,15 +125,21 @@ class MainClass(QMainWindow):
             self.pause = False
             pygame.mixer.music.unpause()
             threading.Thread(target=self.play_music, args=(), daemon=True).start()
+            threading.Thread(target=self.set_volume, args=(), daemon=True).start()
     
     def play_music(self):
         while get_time(pygame.mixer.music.get_pos()) != self.duration:
             if self.pause or not self.start:
                 return
-            pygame.mixer.music.set_volume(self.volume.value() / 100)
             self.progress.setValue(pygame.mixer.music.get_pos())
-            self.progress.setFormat(get_time(pygame.mixer.music.get_pos()))
+            self.progress.setFormat(get_time(pygame.mixer.music.get_pos())) 
         pygame.mixer.music.stop()
+        
+    def set_volume(self):
+        while True:
+            if self.pause or not self.start:
+                    return
+            pygame.mixer.music.set_volume(self.volume.value() / 100)
         
     def update_playlist(self):
         self.playlist.clear()

@@ -5,6 +5,8 @@ from os import path
 from models import PlayList
 from classes import MainClass
 
+import pygame
+
 
 def main():
     app = QApplication(sys.argv)
