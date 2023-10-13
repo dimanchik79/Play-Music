@@ -1,6 +1,8 @@
 import os
+import typing
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtCore import QObject, QThread
 from tinytag import TinyTag
 from models import PlayList
 import threading
@@ -88,7 +90,7 @@ class MainClass(QMainWindow):
             index = self.playlist.currentIndex().row()
             
             for key, word in self.play_list.items():
-                if word[0] == self.playlist.currentItem().text()[:-10]:
+                if word[0] == self.playlist.currentItem().text()[11:]:
                     path = self.play_list[key][1]
                     self.duration = self.play_list[key][2]
                     self.duration_sec = self.play_list[key][3]
@@ -111,9 +113,8 @@ class MainClass(QMainWindow):
                     return
             else:
                 threading.Thread(target=self.play_music, args=(), daemon=True).start()
-                threading.Thread(target=self.set_volume, args=(), daemon=True).start()
                 return
-        
+            
         if not self.pause:
             self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
             self.play.setIconSize(QtCore.QSize(28,28))
@@ -125,26 +126,19 @@ class MainClass(QMainWindow):
             self.pause = False
             pygame.mixer.music.unpause()
             threading.Thread(target=self.play_music, args=(), daemon=True).start()
-            threading.Thread(target=self.set_volume, args=(), daemon=True).start()
-    
-    def play_music(self):
-        while get_time(pygame.mixer.music.get_pos()) != self.duration:
-            if self.pause or not self.start:
-                return
-            self.progress.setValue(pygame.mixer.music.get_pos())
-            self.progress.setFormat(get_time(pygame.mixer.music.get_pos())) 
-        pygame.mixer.music.stop()
-        
-    def set_volume(self):
-        while True:
-            if self.pause or not self.start:
-                    return
-            pygame.mixer.music.set_volume(self.volume.value() / 100)
         
     def update_playlist(self):
         self.playlist.clear()
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
-                self.playlist.addItem(f"{row.song_name}, {row.duration}")
+                self.playlist.addItem(f"{row.duration} | {row.song_name}")
             self.play_list[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec]
-        
+
+    def play_music(self):
+        while get_time(pygame.mixer.music.get_pos()) != self.duration:
+            if self.pause or not self.start:
+                return
+            self.progress.setValue(pygame.mixer.music.get_pos())
+            self.progress.setFormat(get_time(pygame.mixer.music.get_pos()))
+            pygame.mixer.music.set_volume(self.volume.value() / 100)  
+        pygame.mixer.music.stop()
