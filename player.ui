@@ -262,7 +262,7 @@
    <widget class="QPushButton" name="up">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>230</x>
       <y>600</y>
       <width>41</width>
       <height>41</height>
@@ -288,7 +288,7 @@
    <widget class="QPushButton" name="down">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>270</x>
       <y>600</y>
       <width>41</width>
       <height>41</height>
@@ -345,64 +345,6 @@
       <width>441</width>
       <height>371</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="fading">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>610</y>
-      <width>51</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Faiding</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>IMG/volumeud.ico</normaloff>IMG/volumeud.ico</iconset>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>20</width>
-      <height>20</height>
-     </size>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="loop">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>610</y>
-      <width>41</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="baseSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="toolTip">
-     <string>Loop</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>IMG/loop.ico</normaloff>IMG/loop.ico</iconset>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>20</width>
-      <height>20</height>
-     </size>
     </property>
    </widget>
    <widget class="QWidget" name="widget" native="true">
