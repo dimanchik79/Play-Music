@@ -73,6 +73,7 @@ class MainClass(QMainWindow):
         self.progress.setValue(0)
         self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
         self.play.setIconSize(QtCore.QSize(28, 28))
+        self.playlist.item(self.song_id_old).setForeground(QtGui.QColor('black'))
         pygame.mixer.music.stop()
         pygame.mixer.music.unload()
 
@@ -102,7 +103,7 @@ class MainClass(QMainWindow):
             self.playlist.item(index).setForeground(QtGui.QColor('blue'))
 
             pygame.mixer.music.load(path_file)
-            pygame.mixer.music.play(loops=0, fade_ms=1000 if self.fading.checkState() == 2 else 0)
+            pygame.mixer.music.play(loops=0)
 
             for thread in threading.enumerate():
                 if "play_music" in thread.name:
