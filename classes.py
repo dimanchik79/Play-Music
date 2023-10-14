@@ -26,20 +26,12 @@ def get_time(duration):
 class MainClass(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        
-        self.play_list = {}
-        self.pause = False
-        self.start = False
-        self.duration = None
-        self.duretion_sec = None
-        self.duratoin_old = None
-        self.song_id = None
-        self.song_id_old = None
-        self.total_songs = 0
-        self.wait = 0
+
+        (self.play_list, self.pause, self.start, self. duration, self.duration_sec, self.duration_old, self.song_id,
+         self.song_id_old, self.total_songs, self.wait) = [{}, False, False, None, None, None, None, None, 0, 0]
 
         uic.loadUi("player.ui", self)
-        
+
         self.add.clicked.connect(self.file_add)
         self.play.clicked.connect(self.press_play_button)
         self.stop.clicked.connect(self.press_stop_button)

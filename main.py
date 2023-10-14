@@ -8,8 +8,8 @@ from classes import MainClass
 
 def main():
     app = QApplication(sys.argv)
-    mainwindow = MainClass()
-    mainwindow.show()
+    main_window = MainClass()
+    main_window.show()
     sys.exit(app.exec())
     
 
