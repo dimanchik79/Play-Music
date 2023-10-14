@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>460</width>
-    <height>666</height>
+    <height>648</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,30 +27,17 @@
    </size>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QFrame" name="view">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>441</width>
-      <height>171</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Box</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Sunken</enum>
-    </property>
-   </widget>
    <widget class="QDial" name="volume">
     <property name="geometry">
      <rect>
       <x>404</x>
-      <y>180</y>
+      <y>160</y>
       <width>50</width>
       <height>64</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Volume</string>
     </property>
     <property name="maximum">
      <number>100</number>
@@ -69,10 +56,13 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>190</y>
+      <y>170</y>
       <width>41</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Stop music</string>
     </property>
     <property name="text">
      <string/>
@@ -92,7 +82,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>190</y>
+      <y>170</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -121,10 +111,13 @@
     <property name="geometry">
      <rect>
       <x>55</x>
-      <y>200</y>
+      <y>180</y>
       <width>221</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Progress</string>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -140,10 +133,13 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>190</y>
+      <y>170</y>
       <width>41</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>previous song</string>
     </property>
     <property name="text">
      <string/>
@@ -163,10 +159,13 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>190</y>
+      <y>170</y>
       <width>41</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Next song</string>
     </property>
     <property name="text">
      <string/>
@@ -186,10 +185,13 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>620</y>
+      <y>600</y>
       <width>41</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Add songs in playlist</string>
     </property>
     <property name="text">
      <string/>
@@ -209,10 +211,13 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>620</y>
+      <y>600</y>
       <width>41</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Rempve song from playlist</string>
     </property>
     <property name="text">
      <string/>
@@ -232,10 +237,13 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>620</y>
+      <y>600</y>
       <width>41</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Clear playlist</string>
     </property>
     <property name="text">
      <string/>
@@ -254,11 +262,14 @@
    <widget class="QPushButton" name="up">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>620</y>
+      <x>170</x>
+      <y>600</y>
       <width>41</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Song down in playlist</string>
     </property>
     <property name="text">
      <string/>
@@ -277,11 +288,14 @@
    <widget class="QPushButton" name="down">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>620</y>
+      <x>210</x>
+      <y>600</y>
       <width>41</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Song up in playlist</string>
     </property>
     <property name="text">
      <string/>
@@ -297,14 +311,17 @@
      </size>
     </property>
    </widget>
-   <widget class="QPushButton" name="exit">
+   <widget class="QPushButton" name="exit_btn">
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>620</y>
+      <y>600</y>
       <width>41</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Exit program</string>
     </property>
     <property name="text">
      <string/>
@@ -324,10 +341,100 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>240</y>
+      <y>220</y>
       <width>441</width>
       <height>371</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="fading">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>610</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Faiding</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>IMG/volumeud.ico</normaloff>IMG/volumeud.ico</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="loop">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>610</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="toolTip">
+     <string>Loop</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>IMG/loop.ico</normaloff>IMG/loop.ico</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>441</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: black;</string>
+    </property>
+   </widget>
+   <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>441</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
     </property>
    </widget>
   </widget>
