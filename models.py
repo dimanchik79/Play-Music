@@ -3,7 +3,7 @@ from peewee import *
 """В модуле реализованы модели базы банных
    с помощью библиотеки PEEWEE"""
 
-DB = SqliteDatabase('DB/playlis.db')
+DB = SqliteDatabase('DB/playlist.db')
 
 
 class BaseModel(Model):
