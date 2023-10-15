@@ -1,12 +1,14 @@
 import os
+import time
+
+import threading
+import pygame
+
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow
 from tinytag import TinyTag
 from models import PlayList
-import threading
-
-import pygame
 
 pygame.mixer.init()
 
@@ -26,9 +28,11 @@ class MainClass(QMainWindow):
         super().__init__()
 
         (self.play_list, self.pause, self.start, self.duration, self.duration_sec, self.duration_old, self.song_id,
-         self.song_id_old, self.total_songs, self.wait) = [{}, False, False, None, None, None, None, None, 0, 0]
+         self.song_id_old, self.total_songs, self.wait, self.vol) = [{}, False, False, None, None, None, None, None,
+                                                                     0, 0, 0]
 
         uic.loadUi("player.ui", self)
+        self.setFixedSize(460, 648)
 
         self.add.clicked.connect(self.file_add)
         self.play.clicked.connect(self.press_play_button)
@@ -36,6 +40,8 @@ class MainClass(QMainWindow):
         self.exit_btn.clicked.connect(self.exit_program)
 
         self.playlist.doubleClicked.connect(self.bind_tree_change_song)
+        self.soft.clicked.connect(self.thread_soft_volume_off)
+        # self.volume.valueChanged.connect(lambda: self.soft.setCheckState(0))
 
         self.update_playlist()
         self.playlist.setFocus()
@@ -51,10 +57,43 @@ class MainClass(QMainWindow):
         self.press_stop_button()
         self.press_play_button()
 
+    def thread_soft_volume_off(self):
+        for thread in threading.enumerate():
+            if "soft_volume_off" in thread.name:
+                return
+        else:
+            threading.Thread(target=self.soft_volume_off, args=(), daemon=True).start()
+
+    def soft_volume_off(self):
+        if self.soft.checkState() == 2:
+            self.soft.setEnabled(False)
+            self.volume.setEnabled(False)
+            self.vol = self.volume.value()
+            vol = self.vol
+            while vol != -1:
+                self.volume.setValue(vol)
+                pygame.mixer.music.set_volume(vol / 100)
+                time.sleep(0.05)
+                vol -= 1
+            self.soft.setEnabled(True)
+            self.volume.setEnabled(True)
+        else:
+            vol = 0
+            self.soft.setEnabled(False)
+            self.volume.setEnabled(False)
+            while vol != self.vol:
+                self.volume.setValue(vol)
+                pygame.mixer.music.set_volume(self.volume.value() / 100)
+                time.sleep(0.05)
+                vol += 1
+            self.soft.setEnabled(True)
+            self.volume.setEnabled(True)
+
     def file_add(self):
         songs = QtWidgets.QFileDialog.getOpenFileNames(filter="*.mp3 *.wav")[0]
         if not songs:
             return
+
         for song_file in songs:
             song = TinyTag.get(song_file)
             text_name = song_file[song_file.rindex("/") + 1:]

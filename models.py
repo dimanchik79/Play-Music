@@ -16,3 +16,11 @@ class PlayList(BaseModel):
     song_path = CharField(max_length=250)
     duration = CharField(max_length=8)
     duration_sec = FloatField()
+
+
+class PlayLists(BaseModel):
+    plist_name = CharField(max_length=250)
+    song_name = CharField(max_length=250)
+    song_path = CharField(max_length=250)
+    duration = CharField(max_length=8)
+    duration_sec = FloatField()
