@@ -6,7 +6,7 @@ import pygame
 
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QDialog
 from tinytag import TinyTag
 from models import PlayList
 
@@ -27,12 +27,14 @@ class MainClass(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
-        (self.play_list, self.pause, self.start, self.duration, self.duration_sec, self.duration_old, self.song_id,
-         self.song_id_old, self.total_songs, self.wait, self.vol) = [{}, False, False, None, None, None, None, 0,
-                                                                     0, 0, 0]
+        (self.play_list, self.pause, self.start, self.duration,
+         self.duration_sec, self.duration_old, self.song_id,
+         self.song_id_old, self.total_songs, self.wait, self.vol,
+         self.p_text, self.save_window) = [{}, False, False, None, None, None, None, 0, 0, 0, 0, "", None]
 
-        uic.loadUi("player.ui", self)
-        self.setFixedSize(460, 648)
+        uic.loadUi("DIALOG/player.ui", self)
+
+        self.setFixedSize(501, 648)
 
         self.add.clicked.connect(self.file_add)
         self.play.clicked.connect(self.press_play_button)
@@ -41,7 +43,7 @@ class MainClass(QMainWindow):
 
         self.playlist.doubleClicked.connect(self.bind_tree_change_song)
         self.soft.clicked.connect(self.thread_soft_volume_off)
-        # self.volume.valueChanged.connect(lambda: self.soft.setCheckState(0))
+        self.save.clicked.connect(self.save_playlist)
 
         self.update_playlist()
         self.playlist.setFocus()
@@ -93,7 +95,6 @@ class MainClass(QMainWindow):
         songs = QtWidgets.QFileDialog.getOpenFileNames(filter="*.mp3 *.wav")[0]
         if not songs:
             return
-
         for song_file in songs:
             song = TinyTag.get(song_file)
             text_name = song_file[song_file.rindex("/") + 1:]
@@ -101,22 +102,23 @@ class MainClass(QMainWindow):
             PlayList.create(song_name=text_name,
                             song_path=song_file,
                             duration=text_time,
-                            duration_sec=song.duration)
+                            duration_sec=song.duration,
+                            list_name=self.p_text if self.p_text != "" else "*")
         self.update_playlist()
-        self.total_songs = len(self.play_list)
         self.playlist.setFocus()
 
-    def press_stop_button(self):
+    def press_stop_button(self) -> None:
         self.start = False
         self.pause = False
         self.progress.setValue(0)
+        self.progress.setFormat("00:00:00")
         self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
         self.play.setIconSize(QtCore.QSize(28, 28))
         self.playlist.item(self.song_id_old).setForeground(QtGui.QColor('black'))
         pygame.mixer.music.stop()
         pygame.mixer.music.unload()
 
-    def press_play_button(self):
+    def press_play_button(self) -> None:
         if not self.start:
             self.start = True
             path_file = ''
@@ -167,8 +169,10 @@ class MainClass(QMainWindow):
         self.playlist.clear()
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
-                self.playlist.addItem(f"{row.duration} | {row.song_name}")
+                self.playlist.addItem(f"{row.duration} # {row.song_name}")
             self.play_list[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec]
+        self.total_songs = len(self.play_list)
+        self.number.display(str(self.total_songs))
 
     def play_music(self):
         while get_time(pygame.mixer.music.get_pos()) != self.duration:
@@ -185,3 +189,14 @@ class MainClass(QMainWindow):
         pygame.mixer.music.stop()
         pygame.mixer.music.unload()
         self.close()
+
+    def save_playlist(self):
+        self.save_window = SaveClass()
+        self.save_window.show()
+
+
+class SaveClass(QDialog):
+    def __init__(self) -> None:
+        super().__init__()
+        uic.loadUi("DIALOG/save.ui", self)
+        self.setFixedSize(400, 120)
