@@ -28,7 +28,7 @@ class MainClass(QMainWindow):
         super().__init__()
 
         (self.play_list, self.pause, self.start, self.duration, self.duration_sec, self.duration_old, self.song_id,
-         self.song_id_old, self.total_songs, self.wait, self.vol) = [{}, False, False, None, None, None, None, None,
+         self.song_id_old, self.total_songs, self.wait, self.vol) = [{}, False, False, None, None, None, None, 0,
                                                                      0, 0, 0]
 
         uic.loadUi("player.ui", self)
