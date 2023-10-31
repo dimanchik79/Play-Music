@@ -65,8 +65,8 @@ class MainClass(QMainWindow):
         self.press_play_button()
 
     def thread_soft_volume_off(self):
-        for thread in threading.enumerate():
-            if "soft_volume_off" in thread.name:
+        for process in threading.enumerate():
+            if process.name.count("soft_volume_off"):
                 return
         else:
             threading.Thread(target=self.soft_volume_off, args=(), daemon=True).start()
@@ -117,7 +117,7 @@ class MainClass(QMainWindow):
         self.start = False
         self.pause = False
         self.progress.setValue(0)
-        self.progress.setFormat("00:00:00")
+        self.clock.setText("00:00:00")
         self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
         self.play.setIconSize(QtCore.QSize(28, 28))
         self.playlist.item(self.song_id_old).setForeground(QtGui.QColor('black'))
@@ -128,33 +128,23 @@ class MainClass(QMainWindow):
             self.start = True
             self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
             self.play.setIconSize(QtCore.QSize(28, 28))
-
             self.count = self.playlist.currentIndex().row()
-
             key = self.id[self.count]
             path_file = self.play_list[key][1]
             self.duration = self.play_list[key][2]
             self.duration_sec = self.play_list[key][3]
-
             self.progress.setMaximum(int(self.duration_sec * 1000))
             self.progress.setMinimum(0)
-
             if self.song_id_old is not None:
                 self.playlist.item(self.song_id_old).setForeground(QtGui.QColor('black'))
-
             self.song_id = self.count
             self.song_id_old = self.song_id
             self.playlist.item(self.count).setForeground(QtGui.QColor('blue'))
-
             pygame.mixer.music.load(path_file)
             pygame.mixer.music.play(loops=0)
 
-            for thread in threading.enumerate():
-                if "play_music" in thread.name:
-                    return
-            else:
-                threading.Thread(target=self.play_music, args=(), daemon=True).start()
-                return
+            threading.Thread(target=self.play_music, args=(), daemon=True).start()
+            return
 
         if not self.pause:
             self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
@@ -166,7 +156,12 @@ class MainClass(QMainWindow):
             self.play.setIconSize(QtCore.QSize(28, 28))
             self.pause = False
             pygame.mixer.music.unpause()
-            threading.Thread(target=self.play_music, args=(), daemon=True).start()
+            for process in threading.enumerate():
+                if process.name.count("play_music"):
+                    return
+            else:
+                threading.Thread(target=self.play_music, args=(), daemon=True).start()
+                return
 
     def update_playlist(self):
         self.id = []
@@ -180,11 +175,11 @@ class MainClass(QMainWindow):
         self.number.display(str(self.total_songs))
 
     def play_music(self):
-        while get_time(pygame.mixer.music.get_pos()) != self.duration:
+        while pygame.mixer.music.get_pos() <= self.duration_sec * 1000:
             if self.pause or not self.start:
                 return
             self.progress.setValue(pygame.mixer.music.get_pos())
-            self.progress.setFormat(get_time(pygame.mixer.music.get_pos()))
+            self.clock.setText(get_time(pygame.mixer.music.get_pos()))
             pygame.mixer.music.set_volume(self.volume.value() / 100)
         self.next_song()
 
