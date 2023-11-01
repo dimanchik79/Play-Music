@@ -5,10 +5,10 @@ import pygame
 
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QDialog
+from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox
 from tinytag import TinyTag
 
-from models import PlayList
+from models import PlayList, Albums
 
 pygame.mixer.init()
 
@@ -107,7 +107,7 @@ class MainClass(QMainWindow):
                             song_path=song_file,
                             duration=text_time,
                             duration_sec=song.duration,
-                            list_name=self.p_text if self.p_text != "" else "*")
+                            album=self.p_text if self.p_text != "" else "*")
         self.update_playlist()
         self.playlist.setCurrentRow(self.count)
         self.playlist.setFocus()
@@ -215,7 +215,24 @@ class MainClass(QMainWindow):
             self.save_album()
 
     def save_album(self):
-        print("save")
+        Albums.delete().where(Albums.album == self.save_window.name.text()).execute()
+        PlayList.delete().execute()
+        for key, word in self.play_list.items():
+
+            Albums.create(song_name=word[0],
+                          song_path=word[1],
+                          duration=word[2],
+                          duration_sec=word[3],
+                          album=self.save_window.name.text())
+            PlayList.create(song_name=word[0],
+                            song_path=word[1],
+                            duration=word[2],
+                            duration_sec=word[3],
+                            album=self.save_window.name.text())
+
+        self.press_stop_button()
+        self.play_list = {}
+        self.update_playlist()
 
 
 class SaveClass(QDialog):

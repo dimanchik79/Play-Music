@@ -25,5 +25,3 @@ class Albums(BaseModel):
     duration = CharField(max_length=8)
     duration_sec = FloatField()
     album = CharField(max_length=250)
-
-
