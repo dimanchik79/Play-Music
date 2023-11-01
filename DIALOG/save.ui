@@ -23,9 +23,9 @@
   <widget class="QDialogButtonBox" name="ok">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>80</y>
-     <width>201</width>
+     <width>191</width>
      <height>32</height>
     </rect>
    </property>
@@ -39,7 +39,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
    </property>
    <property name="centerButtons">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QCheckBox" name="ch_name">
@@ -47,19 +47,25 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>151</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
     <string>Change Name</string>
    </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QLineEdit" name="name">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>40</y>
+     <y>45</y>
      <width>381</width>
      <height>22</height>
     </rect>

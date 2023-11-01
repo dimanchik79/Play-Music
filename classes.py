@@ -1,6 +1,5 @@
 import os
 import time
-
 import threading
 import pygame
 
@@ -8,6 +7,7 @@ from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QDialog
 from tinytag import TinyTag
+
 from models import PlayList
 
 pygame.mixer.init()
@@ -174,16 +174,6 @@ class MainClass(QMainWindow):
             album.append(word[4])
         self.album = ", ".join(set(album))
         self.album_txt.setText(self.album)
-        for process in threading.enumerate():
-            if process.name.count("set_color_album"):
-                process.is_alive()
-        threading.Thread(target=self.set_color_album, args=(), daemon=True).start()
-
-    def set_color_album(self):
-        for color in range(255, 0, -1):
-            self.album_txt.setStyleSheet(f"border: 1px solid rgb(85, 0, 0); border-radius: 5px; color: rgb({color}, "
-                                         f"{color}, {color});")
-            time.sleep(0.01)
 
     def play_music(self):
         while get_time(pygame.mixer.music.get_pos()) != self.duration:
@@ -218,12 +208,29 @@ class MainClass(QMainWindow):
         self.close()
 
     def save_playlist(self):
-        self.save_window = SaveClass()
+        self.save_window = SaveClass(self.album)
         self.save_window.show()
+        self.save_window.exec_()
+        if self.save_window.result() == 1:
+            self.save_album()
+
+    def save_album(self):
+        print("save")
 
 
 class SaveClass(QDialog):
-    def __init__(self) -> None:
+    def __init__(self, album) -> None:
         super().__init__()
+        self.album = album
         uic.loadUi("DIALOG/save.ui", self)
         self.setFixedSize(400, 120)
+        self.name.setText(self.album)
+        self.name.setDisabled(True)
+        self.ch_name.stateChanged.connect(self.enabled_textline)
+
+    def enabled_textline(self, checked):
+        if checked == 2:
+            self.name.setDisabled(False)
+            self.name.setFocus()
+        else:
+            self.name.setDisabled(True)

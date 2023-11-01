@@ -19,3 +19,11 @@ class PlayList(BaseModel):
     album = CharField(max_length=250)
 
 
+class Albums(BaseModel):
+    song_name = CharField(max_length=250)
+    song_path = CharField(max_length=250)
+    duration = CharField(max_length=8)
+    duration_sec = FloatField()
+    album = CharField(max_length=250)
+
+
