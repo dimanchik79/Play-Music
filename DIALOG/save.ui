@@ -42,7 +42,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox_2">
+  <widget class="QCheckBox" name="ch_name">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -55,7 +55,7 @@
     <string>Change Name</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="name">
    <property name="geometry">
     <rect>
      <x>10</x>

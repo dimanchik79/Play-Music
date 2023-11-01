@@ -30,8 +30,8 @@ class MainClass(QMainWindow):
         (self.play_list, self.pause, self.start, self.duration,
          self.duration_sec, self.duration_old, self.song_id,
          self.song_id_old, self.total_songs, self.wait, self.vol,
-         self.p_text, self.save_window, self.count, self.id) = [{}, False, False, None, None, None, None, 0, 0, 0, 0,
-                                                                "", None, 0, []]
+         self.p_text, self.save_window, self.count, self.id, self.album) = [{}, False, False, None, None, None, None, 0,
+                                                                            0, 0, 0, "", None, 0, [], ""]
 
         uic.loadUi("DIALOG/player.ui", self)
 
@@ -67,9 +67,8 @@ class MainClass(QMainWindow):
     def thread_soft_volume_off(self):
         for process in threading.enumerate():
             if process.name.count("soft_volume_off"):
-                return
-        else:
-            threading.Thread(target=self.soft_volume_off, args=(), daemon=True).start()
+                process.is_alive()
+        threading.Thread(target=self.soft_volume_off, args=(), daemon=True).start()
 
     def soft_volume_off(self):
         if self.soft.checkState() == 2:
@@ -116,7 +115,6 @@ class MainClass(QMainWindow):
     def press_stop_button(self) -> None:
         self.start = False
         self.pause = False
-        self.progress.setValue(0)
         self.clock.setText("00:00:00")
         self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
         self.play.setIconSize(QtCore.QSize(28, 28))
@@ -133,8 +131,6 @@ class MainClass(QMainWindow):
             path_file = self.play_list[key][1]
             self.duration = self.play_list[key][2]
             self.duration_sec = self.play_list[key][3]
-            self.progress.setMaximum(int(self.duration_sec * 1000))
-            self.progress.setMinimum(0)
             if self.song_id_old is not None:
                 self.playlist.item(self.song_id_old).setForeground(QtGui.QColor('black'))
             self.song_id = self.count
@@ -142,7 +138,9 @@ class MainClass(QMainWindow):
             self.playlist.item(self.count).setForeground(QtGui.QColor('blue'))
             pygame.mixer.music.load(path_file)
             pygame.mixer.music.play(loops=0)
-
+            for process in threading.enumerate():
+                if process.name.count("play_music"):
+                    process.is_alive()
             threading.Thread(target=self.play_music, args=(), daemon=True).start()
             return
 
@@ -158,27 +156,39 @@ class MainClass(QMainWindow):
             pygame.mixer.music.unpause()
             for process in threading.enumerate():
                 if process.name.count("play_music"):
-                    return
-            else:
-                threading.Thread(target=self.play_music, args=(), daemon=True).start()
-                return
+                    process.is_alive()
+            threading.Thread(target=self.play_music, args=(), daemon=True).start()
 
     def update_playlist(self):
+        album = []
         self.id = []
         self.playlist.clear()
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
                 self.playlist.addItem(f"{row.duration} # {row.song_name}")
-            self.play_list[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec, row.list_name]
+            self.play_list[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec, row.album]
             self.id.append(row.id)
         self.total_songs = len(self.play_list)
         self.number.display(str(self.total_songs))
+        for key, word in self.play_list.items():
+            album.append(word[4])
+        self.album = ", ".join(set(album))
+        self.album_txt.setText(self.album)
+        for process in threading.enumerate():
+            if process.name.count("set_color_album"):
+                process.is_alive()
+        threading.Thread(target=self.set_color_album, args=(), daemon=True).start()
+
+    def set_color_album(self):
+        for color in range(255, 0, -1):
+            self.album_txt.setStyleSheet(f"border: 1px solid rgb(85, 0, 0); border-radius: 5px; color: rgb({color}, "
+                                         f"{color}, {color});")
+            time.sleep(0.01)
 
     def play_music(self):
-        while pygame.mixer.music.get_pos() <= self.duration_sec * 1000:
+        while get_time(pygame.mixer.music.get_pos()) != self.duration:
             if self.pause or not self.start:
                 return
-            self.progress.setValue(pygame.mixer.music.get_pos())
             self.clock.setText(get_time(pygame.mixer.music.get_pos()))
             pygame.mixer.music.set_volume(self.volume.value() / 100)
         self.next_song()
@@ -203,7 +213,6 @@ class MainClass(QMainWindow):
 
     def exit_program(self):
         self.pause = True
-        self.progress.setValue(0)
         pygame.mixer.music.stop()
         pygame.mixer.music.unload()
         self.close()

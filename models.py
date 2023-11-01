@@ -16,6 +16,6 @@ class PlayList(BaseModel):
     song_path = CharField(max_length=250)
     duration = CharField(max_length=8)
     duration_sec = FloatField()
-    list_name = CharField(max_length=250)
+    album = CharField(max_length=250)
 
 
