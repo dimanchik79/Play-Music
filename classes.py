@@ -48,6 +48,7 @@ class MainClass(QMainWindow):
         self.playlist.doubleClicked.connect(self.bind_tree_change_song)
         self.soft.clicked.connect(self.thread_soft_volume_off)
         self.save.clicked.connect(self.save_playlist)
+        self.clear.clicked.connect(self.clear_playlist)
 
         self.update_playlist()
         self.playlist.setCurrentRow(self.count)
@@ -115,6 +116,7 @@ class MainClass(QMainWindow):
     def press_stop_button(self) -> None:
         self.start = False
         self.pause = False
+        self.progress.setValue(0)
         self.clock.setText("00:00:00")
         self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
         self.play.setIconSize(QtCore.QSize(28, 28))
@@ -136,6 +138,10 @@ class MainClass(QMainWindow):
             self.song_id = self.count
             self.song_id_old = self.song_id
             self.playlist.item(self.count).setForeground(QtGui.QColor('blue'))
+
+            self.progress.setMinimum(0)
+            self.progress.setMaximum(int(self.duration_sec * 1000) - 1000)
+
             pygame.mixer.music.load(path_file)
             pygame.mixer.music.play(loops=0)
             for process in threading.enumerate():
@@ -165,11 +171,11 @@ class MainClass(QMainWindow):
         self.playlist.clear()
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
-                self.playlist.addItem(f"{row.duration} # {row.song_name}")
+                self.playlist.addItem(f"{row.duration} _ {row.song_name}")
             self.play_list[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec, row.album]
             self.id.append(row.id)
         self.total_songs = len(self.play_list)
-        self.number.display(str(self.total_songs))
+        self.number.setText(str(self.total_songs))
         for key, word in self.play_list.items():
             album.append(word[4])
         self.album = ", ".join(set(album))
@@ -180,6 +186,7 @@ class MainClass(QMainWindow):
             if self.pause or not self.start:
                 return
             self.clock.setText(get_time(pygame.mixer.music.get_pos()))
+            self.progress.setValue(pygame.mixer.music.get_pos())
             pygame.mixer.music.set_volume(self.volume.value() / 100)
         self.next_song()
 
@@ -213,6 +220,12 @@ class MainClass(QMainWindow):
         self.save_window.exec_()
         if self.save_window.result() == 1:
             self.save_album()
+
+    def clear_playlist(self):
+        PlayList.delete().execute()
+        self.press_stop_button()
+        self.play_list = {}
+        self.update_playlist()
 
     def save_album(self):
         Albums.delete().where(Albums.album == self.save_window.name.text()).execute()
