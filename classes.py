@@ -5,7 +5,7 @@ import pygame
 
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QDialog
 from tinytag import TinyTag
 
 from models import PlayList, Albums
@@ -218,7 +218,6 @@ class MainClass(QMainWindow):
         Albums.delete().where(Albums.album == self.save_window.name.text()).execute()
         PlayList.delete().execute()
         for key, word in self.play_list.items():
-
             Albums.create(song_name=word[0],
                           song_path=word[1],
                           duration=word[2],
