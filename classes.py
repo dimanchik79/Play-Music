@@ -26,12 +26,12 @@ def get_time(duration):
 class MainClass(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-
+        self.open_window = None
         (self.play_list, self.pause, self.start, self.duration,
          self.duration_sec, self.duration_old, self.song_id,
          self.song_id_old, self.total_songs, self.wait, self.vol,
-         self.p_text, self.save_window, self.count, self.id, self.album) = [{}, False, False, None, None, None, None, 0,
-                                                                            0, 0, 0, "", None, 0, [], ""]
+         self.p_text, self.save_window, self.count, self.id,
+         self.album) = [{}, False, False, None, None, None, None, 0, 0, 0, 0, "", None, 0, [], ""]
 
         uic.loadUi("DIALOG/player.ui", self)
 
@@ -48,6 +48,7 @@ class MainClass(QMainWindow):
         self.playlist.doubleClicked.connect(self.bind_tree_change_song)
         self.soft.clicked.connect(self.thread_soft_volume_off)
         self.save.clicked.connect(self.save_playlist)
+        self.open.clicked.connect(self.open_playlist)
         self.clear.clicked.connect(self.clear_playlist)
 
         self.update_playlist()
@@ -144,6 +145,7 @@ class MainClass(QMainWindow):
 
             pygame.mixer.music.load(path_file)
             pygame.mixer.music.play(loops=0)
+
             for process in threading.enumerate():
                 if process.name.count("play_music"):
                     process.is_alive()
@@ -169,6 +171,7 @@ class MainClass(QMainWindow):
         album = []
         self.id = []
         self.playlist.clear()
+        self.count = 0
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
                 self.playlist.addItem(f"{row.duration} _ {row.song_name}")
@@ -179,7 +182,12 @@ class MainClass(QMainWindow):
         for key, word in self.play_list.items():
             album.append(word[4])
         self.album = ", ".join(set(album))
-        self.album_txt.setText(self.album)
+        self.album_txt.setText(self.album if self.album != "*" else "NoName")
+        if "*" in self.album:
+            self.album_txt.setStyleSheet("border: 1px solid rgb(85, 0, 0);border-radius: 5px;color: rgb(255, 0, 0);")
+        else:
+            self.album_txt.setStyleSheet("border: 1px solid rgb(85, 0, 0);border-radius: 5px;color: rgb(0, 0, 0);")
+        self.album_txt.setToolTip = self.album_txt.text()
 
     def play_music(self):
         while get_time(pygame.mixer.music.get_pos()) != self.duration:
@@ -215,11 +223,35 @@ class MainClass(QMainWindow):
         self.close()
 
     def save_playlist(self):
-        self.save_window = SaveClass(self.album)
+        self.save_window = SaveAlbum(self.album)
         self.save_window.show()
         self.save_window.exec_()
         if self.save_window.result() == 1:
             self.save_album()
+
+    def open_playlist(self):
+        self.open_window = OpenAlbum()
+        self.open_window.show()
+        self.open_window.exec_()
+        if self.open_window.result() == 1:
+            self.open_album()
+
+    def open_album(self):
+        if self.start:
+            self.press_stop_button()
+        if self.open_window.r_open.isChecked():
+            PlayList.delete().execute()
+        for row in Albums.select().where(Albums.album == self.open_window.albums.currentItem().text()):
+            PlayList.create(song_name=row.song_name,
+                            song_path=row.song_path,
+                            duration=row.duration,
+                            duration_sec=row.duration_sec,
+                            album=row.album)
+        self.update_playlist()
+        self.count = 0
+        self.playlist.setCurrentRow(self.count)
+        self.playlist.setFocus()
+
 
     def clear_playlist(self):
         PlayList.delete().execute()
@@ -245,9 +277,10 @@ class MainClass(QMainWindow):
         self.press_stop_button()
         self.play_list = {}
         self.update_playlist()
+        self.playlist.setCurrentRow(self.count)
 
 
-class SaveClass(QDialog):
+class SaveAlbum(QDialog):
     def __init__(self, album) -> None:
         super().__init__()
         self.album = album
@@ -263,3 +296,17 @@ class SaveClass(QDialog):
             self.name.setFocus()
         else:
             self.name.setDisabled(True)
+
+
+class OpenAlbum(QDialog):
+    def __init__(self) -> None:
+        super().__init__()
+        uic.loadUi("DIALOG/open.ui", self)
+        self.setFixedSize(400, 381)
+        self.r_open.setChecked(True)
+        albums = [row.album for row in Albums.select()]
+        if len(albums) != 0:
+            for album in set(albums):
+                self.albums.addItem(album)
+            self.albums.setCurrentRow(0)
+            self.albums.setFocus()
