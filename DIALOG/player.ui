@@ -384,7 +384,7 @@
      </rect>
     </property>
     <property name="toolTip">
-     <string>Save current playlist</string>
+     <string>Save current Album</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(238, 238, 238);</string>
@@ -413,7 +413,7 @@
      </rect>
     </property>
     <property name="toolTip">
-     <string>Open playlist</string>
+     <string>Open Album</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(238, 238, 238);</string>
@@ -533,7 +533,7 @@ color: rgb(0, 0, 0);</string>
    <widget class="QLabel" name="number">
     <property name="geometry">
      <rect>
-      <x>157</x>
+      <x>158</x>
       <y>612</y>
       <width>41</width>
       <height>21</height>

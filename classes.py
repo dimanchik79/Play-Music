@@ -302,7 +302,7 @@ class OpenAlbum(QDialog):
     def __init__(self) -> None:
         super().__init__()
         uic.loadUi("DIALOG/open.ui", self)
-        self.setFixedSize(400, 381)
+        self.setFixedSize(400, 428)
         self.r_open.setChecked(True)
         albums = [row.album for row in Albums.select()]
         if len(albums) != 0:

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Save current PlayList</string>
+   <string>Save current Album</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -19,6 +19,9 @@
   </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 246)</string>
   </property>
   <widget class="QDialogButtonBox" name="ok">
    <property name="geometry">
@@ -31,6 +34,9 @@
    </property>
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(238, 238, 238);</string>
    </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
