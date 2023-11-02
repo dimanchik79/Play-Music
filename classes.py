@@ -174,7 +174,7 @@ class MainClass(QMainWindow):
         self.count = 0
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
-                self.playlist.addItem(f"{row.duration} _ {row.song_name}")
+                self.playlist.addItem(f"{row.duration} │ {row.song_name}")
             self.play_list[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec, row.album]
             self.id.append(row.id)
         self.total_songs = len(self.play_list)
@@ -247,11 +247,11 @@ class MainClass(QMainWindow):
                             duration=row.duration,
                             duration_sec=row.duration_sec,
                             album=row.album)
+        self.play_list = {}
         self.update_playlist()
         self.count = 0
         self.playlist.setCurrentRow(self.count)
         self.playlist.setFocus()
-
 
     def clear_playlist(self):
         PlayList.delete().execute()

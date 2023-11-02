@@ -297,11 +297,22 @@
       <height>371</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+     </font>
+    </property>
     <property name="autoFillBackground">
      <bool>false</bool>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(241, 255, 239)</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="midLineWidth">
+     <number>0</number>
     </property>
     <property name="editTriggers">
      <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
@@ -318,11 +329,17 @@
     <property name="isWrapping" stdset="0">
      <bool>true</bool>
     </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <property name="viewMode">
      <enum>QListView::IconMode</enum>
     </property>
     <property name="modelColumn">
      <number>0</number>
+    </property>
+    <property name="uniformItemSizes">
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QWidget" name="widget" native="true">
