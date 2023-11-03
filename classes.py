@@ -1,11 +1,15 @@
 import os
 import time
 import threading
+
+import PyQt5.QtWidgets
 import pygame
+import requests
 
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QDialog
+from bs4 import BeautifulSoup
 from tinytag import TinyTag
 
 from models import PlayList, Albums
@@ -31,7 +35,8 @@ class MainClass(QMainWindow):
          self.duration_sec, self.duration_old, self.song_id,
          self.song_id_old, self.total_songs, self.wait, self.vol,
          self.p_text, self.save_window, self.count, self.id,
-         self.album) = [{}, False, False, None, None, None, None, 0, 0, 0, 0, "", None, 0, [], ""]
+         self.album, self.news, self.x_pos) = [{}, False, False, None, None, None, None, 0, 0, 0, 0, "", None, 0, [],
+                                               "", "", 481]
 
         uic.loadUi("DIALOG/player.ui", self)
 
@@ -54,6 +59,12 @@ class MainClass(QMainWindow):
         self.update_playlist()
         self.playlist.setCurrentRow(self.count)
         self.playlist.setFocus()
+
+        self.get_news()
+        self.news_text = PyQt5.QtWidgets.QLabel(self.runstring)
+        self.news_text.setText(self.news)
+
+        threading.Thread(target=self.run_string, args=(), daemon=True).start()
 
     def closeEvent(self, event):
         self.exit_program()
@@ -142,6 +153,7 @@ class MainClass(QMainWindow):
 
             self.progress.setMinimum(0)
             self.progress.setMaximum(int(self.duration_sec * 1000) - 1000)
+            self.clock.setText(self.duration)
 
             pygame.mixer.music.load(path_file)
             pygame.mixer.music.play(loops=0)
@@ -193,7 +205,6 @@ class MainClass(QMainWindow):
         while get_time(pygame.mixer.music.get_pos()) != self.duration:
             if self.pause or not self.start:
                 return
-            self.clock.setText(get_time(pygame.mixer.music.get_pos()))
             self.progress.setValue(pygame.mixer.music.get_pos())
             pygame.mixer.music.set_volume(self.volume.value() / 100)
         self.next_song()
@@ -278,6 +289,27 @@ class MainClass(QMainWindow):
         self.play_list = {}
         self.update_playlist()
         self.playlist.setCurrentRow(self.count)
+
+    def get_news(self):
+        link = "https://lenta.ru/parts/news/"
+        response = requests.get(link).text
+        soup = BeautifulSoup(response, 'lxml')
+        block = soup.find_all('h3')
+        for row in block:
+            self.news += row.text + " " + f'<a href="https://lenta.ru/parts/news/">(РИА НОВОСТИ)</a> ... '
+
+    def run_string(self):
+        while True:
+            try:
+                self.news_text.setGeometry(QtCore.QRect(int(self.x_pos), 5, len(self.news * 7), 20))
+                self.x_pos -= 1
+                time.sleep(0.007)
+                if self.x_pos == -(len(self.news) * 7):
+                    self.get_news()
+                    print(len(self.news))
+                    self.x_pos = 481
+            except RuntimeError:
+                break
 
 
 class SaveAlbum(QDialog):
