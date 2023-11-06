@@ -355,25 +355,6 @@
      <string notr="true">background-color: black;</string>
     </property>
    </widget>
-   <widget class="QFrame" name="runstring">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>130</y>
-      <width>481</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 255, 255);</string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Sunken</enum>
-    </property>
-   </widget>
    <widget class="QPushButton" name="save">
     <property name="geometry">
      <rect>
@@ -458,15 +439,15 @@
    <widget class="QLabel" name="clock">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>210</x>
       <y>182</y>
-      <width>61</width>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>8</pointsize>
+      <pointsize>7</pointsize>
      </font>
     </property>
     <property name="toolTip">
@@ -559,111 +540,23 @@ border-radius: 5px;
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QSlider" name="progress">
+   <widget class="QFrame" name="runstring">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>182</y>
-      <width>111</width>
-      <height>22</height>
+      <x>10</x>
+      <y>130</y>
+      <width>481</width>
+      <height>31</height>
      </rect>
     </property>
-    <property name="toolTip">
-     <string>Progress</string>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
     <property name="styleSheet">
-     <string notr="true">QSlider::groove:horizontal {
- 
-border: 1px solid #bbb;
- 
-}
- 
-QSlider::sub-page:horizontal {
- 
-background: rgb(235,97,0);
- 
-border-radius: 0px;
- 
-margin-top:8px;
- 
-margin-bottom:8px;
- 
-}
- 
-QSlider::add-page:horizontal {
- 
-background: rgb(255,255, 255);
- 
-border: 0px solid #777;
- 
-border-radius: 2px;
- 
-margin-top:8px;
- 
-margin-bottom:8px;
- 
-}
- 
-QSlider::handle:horizontal {
- 
-background: rgb(0,0,0);
- 
-border: 1px solid rgb(255,153,102);
- 
-width: 14px;
- 
-height:10px;
- 
-border-radius: 3px;
- 
-margin-top:2px;
- 
-margin-bottom:2px;
- 
-}
- 
-QSlider::handle:horizontal:hover {
- 
-background: rgb(255,128,6);
- 
-border: 1px solid rgba(102,102,102,102);
- 
-border-radius: 7px;
- 
-}
- 
-QSlider::sub-page:horizontal:disabled {
- 
-background: #bbb;
- 
-border-color: #999;
- 
-}
- 
-QSlider::add-page:horizontal:disabled {
- 
-background: #eee;
- 
-border-color: #999;
- 
-}
- 
-QSlider::handle:horizontal:disabled {
- 
-background: #eee;
- 
-border: 1px solid #aaa;
- 
-border-radius: 4px;
- 
-}
-</string>
+     <string notr="true">background-color: rgb(210, 255, 255);</string>
     </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
    </widget>
   </widget>

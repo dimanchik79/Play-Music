@@ -27,6 +27,20 @@ def get_time(duration):
     return f"{hour:}:{minute}:{second[0:] if len(second) < 3 else second[1:]}"
 
 
+def get_news():
+    news = []
+    response = requests.get("https://lenta.ru/parts/news/")
+    if response.status_code > 400:
+        news.append("Check your Internet connect ...")
+        return news
+    response = response.text
+    soup = BeautifulSoup(response, 'lxml')
+    block = soup.find_all('h3')
+    for row in block:
+        news.append(row.text + ' (РИА НОВОСТИ) ... ')
+    return news
+
+
 class MainClass(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
@@ -35,13 +49,14 @@ class MainClass(QMainWindow):
          self.duration_sec, self.duration_old, self.song_id,
          self.song_id_old, self.total_songs, self.wait, self.vol,
          self.p_text, self.save_window, self.count, self.id,
-         self.album, self.news, self.x_pos) = [{}, False, False, None, None, None, None, 0, 0, 0, 0, "", None, 0, [],
-                                               "", "", 481]
+         self.album, self.news_count, self.x_pos) = [{}, False, False, None, None, None, None, 0, 0, 0, 0, "", None, 0,
+                                                     [], "", 0, 481]
 
         uic.loadUi("DIALOG/player.ui", self)
 
         self.setFixedSize(501, 648)
 
+        self.volume.valueChanged.connect(self.volume_change)
         self.add.clicked.connect(self.file_add)
         self.play.clicked.connect(self.press_play_button)
         self.stop.clicked.connect(self.press_stop_button)
@@ -60,11 +75,17 @@ class MainClass(QMainWindow):
         self.playlist.setCurrentRow(self.count)
         self.playlist.setFocus()
 
-        self.get_news()
+        self.news = get_news()
+
         self.news_text = PyQt5.QtWidgets.QLabel(self.runstring)
-        self.news_text.setText(self.news)
+        self.news_text.setText(self.news[self.news_count])
+        self.news_text.setStyleSheet("color: black; border: 0;")
 
         threading.Thread(target=self.run_string, args=(), daemon=True).start()
+
+    def volume_change(self):
+        if self.start:
+            pygame.mixer.music.set_volume(self.volume.value() / 100)
 
     def closeEvent(self, event):
         self.exit_program()
@@ -80,8 +101,9 @@ class MainClass(QMainWindow):
     def thread_soft_volume_off(self):
         for process in threading.enumerate():
             if process.name.count("soft_volume_off"):
-                process.is_alive()
-        threading.Thread(target=self.soft_volume_off, args=(), daemon=True).start()
+                return
+        else:
+            threading.Thread(target=self.soft_volume_off, args=(), daemon=True).start()
 
     def soft_volume_off(self):
         if self.soft.checkState() == 2:
@@ -128,7 +150,6 @@ class MainClass(QMainWindow):
     def press_stop_button(self) -> None:
         self.start = False
         self.pause = False
-        self.progress.setValue(0)
         self.clock.setText("00:00:00")
         self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
         self.play.setIconSize(QtCore.QSize(28, 28))
@@ -137,7 +158,6 @@ class MainClass(QMainWindow):
 
     def press_play_button(self) -> None:
         if not self.start:
-            self.start = True
             self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
             self.play.setIconSize(QtCore.QSize(28, 28))
             self.count = self.playlist.currentIndex().row()
@@ -151,17 +171,19 @@ class MainClass(QMainWindow):
             self.song_id_old = self.song_id
             self.playlist.item(self.count).setForeground(QtGui.QColor('blue'))
 
-            self.progress.setMinimum(0)
-            self.progress.setMaximum(int(self.duration_sec * 1000) - 1000)
             self.clock.setText(self.duration)
 
             pygame.mixer.music.load(path_file)
             pygame.mixer.music.play(loops=0)
 
+            pygame.mixer.music.set_volume(self.volume.value() / 100)
+
             for process in threading.enumerate():
-                if process.name.count("play_music"):
-                    process.is_alive()
-            threading.Thread(target=self.play_music, args=(), daemon=True).start()
+                if "play_music" in process.name:
+                    break
+            else:
+                threading.Thread(target=self.play_music, args=(), daemon=True).start()
+            self.start = True
             return
 
         if not self.pause:
@@ -175,9 +197,10 @@ class MainClass(QMainWindow):
             self.pause = False
             pygame.mixer.music.unpause()
             for process in threading.enumerate():
-                if process.name.count("play_music"):
-                    process.is_alive()
-            threading.Thread(target=self.play_music, args=(), daemon=True).start()
+                if "play_music" in process.name:
+                    break
+            else:
+                threading.Thread(target=self.play_music, args=(), daemon=True).start()
 
     def update_playlist(self):
         album = []
@@ -202,12 +225,17 @@ class MainClass(QMainWindow):
         self.album_txt.setToolTip = self.album_txt.text()
 
     def play_music(self):
-        while get_time(pygame.mixer.music.get_pos()) != self.duration:
+        while True:
             if self.pause or not self.start:
-                return
-            self.progress.setValue(pygame.mixer.music.get_pos())
-            pygame.mixer.music.set_volume(self.volume.value() / 100)
-        self.next_song()
+                pass
+            else:
+                if self.start:
+                    mins, secs = divmod(int(self.duration_sec), 60)
+                    self.clock.setText(f'{mins:02d}:{secs:02d}')
+                    self.duration_sec -= 1
+                    time.sleep(1)
+                    if pygame.mixer.music.get_pos() == -1:
+                        self.next_song()
 
     def next_song(self):
         self.press_stop_button()
@@ -290,24 +318,19 @@ class MainClass(QMainWindow):
         self.update_playlist()
         self.playlist.setCurrentRow(self.count)
 
-    def get_news(self):
-        link = "https://lenta.ru/parts/news/"
-        response = requests.get(link).text
-        soup = BeautifulSoup(response, 'lxml')
-        block = soup.find_all('h3')
-        for row in block:
-            self.news += row.text + " " + f'<a href="https://lenta.ru/parts/news/">(РИА НОВОСТИ)</a> ... '
-
     def run_string(self):
         while True:
             try:
-                self.news_text.setGeometry(QtCore.QRect(int(self.x_pos), 5, len(self.news * 7), 20))
+                self.news_text.setGeometry(self.x_pos, 8, len(self.news[self.news_count]) * 8, 12)
                 self.x_pos -= 1
-                time.sleep(0.007)
-                if self.x_pos == -(len(self.news) * 7):
-                    self.get_news()
-                    print(len(self.news))
+                time.sleep(0.008)
+                if self.x_pos == -(len(self.news[self.news_count]) * 8):
                     self.x_pos = 481
+                    self.news_count += 1
+                    if self.news_count == len(self.news):
+                        self.news = get_news()
+                        self.news_count = 0
+                self.news_text.setText(self.news[self.news_count])
             except RuntimeError:
                 break
 
