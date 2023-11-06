@@ -299,7 +299,10 @@
     </property>
     <property name="font">
      <font>
-      <family>Courier New</family>
+      <family>Times New Roman</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
      </font>
     </property>
     <property name="autoFillBackground">
@@ -441,7 +444,7 @@
      <rect>
       <x>210</x>
       <y>182</y>
-      <width>181</width>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
@@ -456,7 +459,7 @@
     <property name="styleSheet">
      <string notr="true">border: 1px solid rgb(85, 0, 0);
 border-radius: 5px;
-
+color: rgb(85, 16, 255)
 </string>
     </property>
     <property name="text">
@@ -469,9 +472,9 @@ border-radius: 5px;
    <widget class="QLabel" name="album_txt">
     <property name="geometry">
      <rect>
-      <x>206</x>
+      <x>156</x>
       <y>600</y>
-      <width>141</width>
+      <width>191</width>
       <height>41</height>
      </rect>
     </property>
@@ -514,15 +517,16 @@ color: rgb(0, 0, 0);</string>
    <widget class="QLabel" name="number">
     <property name="geometry">
      <rect>
-      <x>158</x>
-      <y>612</y>
-      <width>41</width>
+      <x>330</x>
+      <y>182</y>
+      <width>61</width>
       <height>21</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Lucida Console</family>
+      <pointsize>7</pointsize>
      </font>
     </property>
     <property name="toolTip">

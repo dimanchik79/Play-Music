@@ -82,6 +82,7 @@ class MainClass(QMainWindow):
         self.news_text.setStyleSheet("color: black; border: 0;")
 
         threading.Thread(target=self.run_string, args=(), daemon=True).start()
+        threading.Thread(target=self.play_music, args=(), daemon=True).start()
 
     def volume_change(self):
         if self.start:
@@ -177,12 +178,6 @@ class MainClass(QMainWindow):
             pygame.mixer.music.play(loops=0)
 
             pygame.mixer.music.set_volume(self.volume.value() / 100)
-
-            for process in threading.enumerate():
-                if "play_music" in process.name:
-                    break
-            else:
-                threading.Thread(target=self.play_music, args=(), daemon=True).start()
             self.start = True
             return
 
@@ -196,11 +191,6 @@ class MainClass(QMainWindow):
             self.play.setIconSize(QtCore.QSize(28, 28))
             self.pause = False
             pygame.mixer.music.unpause()
-            for process in threading.enumerate():
-                if "play_music" in process.name:
-                    break
-            else:
-                threading.Thread(target=self.play_music, args=(), daemon=True).start()
 
     def update_playlist(self):
         album = []
@@ -209,7 +199,7 @@ class MainClass(QMainWindow):
         self.count = 0
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
-                self.playlist.addItem(f"{row.duration} │ {row.song_name}")
+                self.playlist.addItem(f"{row.duration}│{row.song_name}")
             self.play_list[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec, row.album]
             self.id.append(row.id)
         self.total_songs = len(self.play_list)
@@ -227,7 +217,7 @@ class MainClass(QMainWindow):
     def play_music(self):
         while True:
             if self.pause or not self.start:
-                pass
+                self.clock.setText('---')
             else:
                 if self.start:
                     mins, secs = divmod(int(self.duration_sec), 60)
