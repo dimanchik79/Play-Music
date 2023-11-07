@@ -2,13 +2,13 @@ import os
 import time
 import threading
 
-import PyQt5.QtWidgets
 import pygame
 import requests
 
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QDialog
+from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem
+
 from bs4 import BeautifulSoup
 from tinytag import TinyTag
 
@@ -77,7 +77,7 @@ class MainClass(QMainWindow):
 
         self.news = get_news()
 
-        self.news_text = PyQt5.QtWidgets.QLabel(self.runstring)
+        self.news_text = QtWidgets.QLabel(self.runstring)
         self.news_text.setText(self.news[self.news_count])
         self.news_text.setStyleSheet("color: black; border: 0;")
 
@@ -149,13 +149,16 @@ class MainClass(QMainWindow):
         self.playlist.setFocus()
 
     def press_stop_button(self) -> None:
-        self.start = False
-        self.pause = False
-        self.clock.setText("00:00:00")
-        self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
-        self.play.setIconSize(QtCore.QSize(28, 28))
-        self.playlist.item(self.song_id_old).setForeground(QtGui.QColor('black'))
-        pygame.mixer.music.unload()
+        try:
+            self.start = False
+            self.pause = False
+            self.clock.setText("00:00:00")
+            self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
+            self.play.setIconSize(QtCore.QSize(28, 28))
+            self.playlist.item(self.song_id_old).setForeground(QtGui.QColor('black'))
+            pygame.mixer.music.unload()
+        except RuntimeError:
+            return
 
     def press_play_button(self) -> None:
         if not self.start:
@@ -216,8 +219,11 @@ class MainClass(QMainWindow):
 
     def play_music(self):
         while True:
-            if self.pause or not self.start:
-                self.clock.setText('---')
+            try:
+                if self.pause or not self.start:
+                    self.clock.setText('---')
+            except RuntimeError:
+                break
             else:
                 if self.start:
                     mins, secs = divmod(int(self.duration_sec), 60)
@@ -343,15 +349,49 @@ class SaveAlbum(QDialog):
             self.name.setDisabled(True)
 
 
+class Information(QDialog):
+    def __init__(self, album) -> None:
+        super().__init__()
+        self.info_table = QtWidgets.QTableWidget
+        uic.loadUi("DIALOG/info.ui", self)
+        self.setFixedSize(881, 596)
+
+        info = []
+
+        self.info_table.setColumnCount(3)
+        self.info_table.setHorizontalHeaderLabels(["Songs", "Path", "Duration"])
+        self.info_table.setColumnWidth(0, 400)
+        self.info_table.setColumnWidth(1, 300)
+
+        for album in Albums.select().where(Albums.album == album):
+            info.append([album.song_name, album.song_path[0:album.song_path.rfind("/")], album.duration])
+        self.info_table.setRowCount(len(info))
+
+        for row in range(len(info)):
+            for col in range(3):
+                item = QTableWidgetItem(info[row][col])
+                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+                self.info_table.setItem(row, col, item)
+
+
 class OpenAlbum(QDialog):
     def __init__(self) -> None:
         super().__init__()
+        self.info = None
+
         uic.loadUi("DIALOG/open.ui", self)
         self.setFixedSize(400, 428)
         self.r_open.setChecked(True)
-        albums = [row.album for row in Albums.select()]
-        if len(albums) != 0:
-            for album in set(albums):
+        self.see.clicked.connect(self.album_information)
+
+        self.playlists = [row.album for row in Albums.select()]
+        if len(self.playlists) != 0:
+            for album in set(self.playlists):
                 self.albums.addItem(album)
             self.albums.setCurrentRow(0)
             self.albums.setFocus()
+
+    def album_information(self):
+        self.info = Information(self.albums.currentItem().text())
+        self.info.show()
+        self.info.exec_()
