@@ -17,17 +17,17 @@ from models import PlayList, Albums
 pygame.mixer.init()
 
 
-def get_time(duration):
+def get_time(duration: float) -> str:
+    """Функция преобразует число в формат 00:00:00"""
     duration /= 1000
-    if duration < 0:
-        return
     second = f"{0}{int(duration % 60)}"
     minute = '00' if (duration % 60) == 0 else f"{0}{int(duration / 60)}"
     hour = '00' if (duration % 3600) == 0 else f"{0}{int(duration / 3600)}"
     return f"{hour:}:{minute}:{second[0:] if len(second) < 3 else second[1:]}"
 
 
-def get_news():
+def get_news() -> list:
+    """Функция парсит сайт и возвращает список с анонсами новостей"""
     news = []
     response = requests.get("https://lenta.ru/parts/news/")
     if response.status_code > 400:
@@ -58,6 +58,7 @@ class MainClass(QMainWindow):
 
         self.volume.valueChanged.connect(self.volume_change)
         self.add.clicked.connect(self.file_add)
+        self.del_song.clicked.connect(self.delete_song)
         self.play.clicked.connect(self.press_play_button)
         self.stop.clicked.connect(self.press_stop_button)
         self.forward.clicked.connect(self.next_song)
@@ -83,6 +84,10 @@ class MainClass(QMainWindow):
 
         threading.Thread(target=self.run_string, args=(), daemon=True).start()
         threading.Thread(target=self.play_music, args=(), daemon=True).start()
+
+    def delete_song(self):
+        # TODO удаление песни из списка
+        print("bzbz")
 
     def volume_change(self):
         if self.start:
@@ -237,22 +242,23 @@ class MainClass(QMainWindow):
                         self.next_song()
 
     def next_song(self):
-        self.press_stop_button()
         if self.count < self.total_songs - 1:
             self.count += 1
         else:
             self.count = 0
+        self.next_back()
+
+    def next_back(self):
+        self.press_stop_button()
         self.playlist.setCurrentRow(self.count)
         self.press_play_button()
 
     def back_song(self):
-        self.press_stop_button()
         if self.count > 0:
             self.count -= 1
         else:
             self.count = self.total_songs - 1
-        self.playlist.setCurrentRow(self.count)
-        self.press_play_button()
+        self.next_back()
 
     def exit_program(self):
         self.pause = True

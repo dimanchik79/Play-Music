@@ -116,7 +116,7 @@
     </size>
    </property>
   </widget>
-  <widget class="QPushButton" name="del">
+  <widget class="QPushButton" name="erase">
    <property name="geometry">
     <rect>
      <x>60</x>

@@ -201,7 +201,7 @@
      </size>
     </property>
    </widget>
-   <widget class="QPushButton" name="del">
+   <widget class="QPushButton" name="del_song">
     <property name="geometry">
      <rect>
       <x>60</x>
