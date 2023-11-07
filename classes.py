@@ -161,6 +161,8 @@ class MainClass(QMainWindow):
             return
 
     def press_play_button(self) -> None:
+        if self.play_list == {}:
+            return
         if not self.start:
             self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
             self.play.setIconSize(QtCore.QSize(28, 28))
@@ -202,9 +204,11 @@ class MainClass(QMainWindow):
         self.count = 0
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
-                self.playlist.addItem(f"{row.duration}│{row.song_name}")
-            self.play_list[row.id] = [row.song_name, row.song_path, row.duration, row.duration_sec, row.album]
-            self.id.append(row.id)
+                song = TinyTag.get(row.song_path)
+                self.playlist.addItem(f"{row.duration}│{song.title} ♫ {song.artist}")
+                self.play_list[row.id] = [f"{song.title} ♫ {song.artist}", row.song_path, row.duration,
+                                          row.duration_sec, row.album]
+                self.id.append(row.id)
         self.total_songs = len(self.play_list)
         self.number.setText(str(self.total_songs))
         for key, word in self.play_list.items():
@@ -219,17 +223,16 @@ class MainClass(QMainWindow):
 
     def play_music(self):
         while True:
-            try:
-                if self.pause or not self.start:
-                    self.clock.setText('---')
-            except RuntimeError:
-                break
+            time.sleep(1)
+            if not self.start:
+                self.clock.setText('---')
+            if self.pause:
+                pass
             else:
                 if self.start:
                     mins, secs = divmod(int(self.duration_sec), 60)
                     self.clock.setText(f'{mins:02d}:{secs:02d}')
                     self.duration_sec -= 1
-                    time.sleep(1)
                     if pygame.mixer.music.get_pos() == -1:
                         self.next_song()
 
@@ -319,7 +322,7 @@ class MainClass(QMainWindow):
             try:
                 self.news_text.setGeometry(self.x_pos, 8, len(self.news[self.news_count]) * 8, 12)
                 self.x_pos -= 1
-                time.sleep(0.008)
+                time.sleep(0.009)
                 if self.x_pos == -(len(self.news[self.news_count]) * 8):
                     self.x_pos = 481
                     self.news_count += 1
@@ -359,12 +362,12 @@ class Information(QDialog):
         info = []
 
         self.info_table.setColumnCount(3)
-        self.info_table.setHorizontalHeaderLabels(["Songs", "Path", "Duration"])
+        self.info_table.setHorizontalHeaderLabels(["File", "Path", "Duration"])
         self.info_table.setColumnWidth(0, 400)
         self.info_table.setColumnWidth(1, 300)
 
         for album in Albums.select().where(Albums.album == album):
-            info.append([album.song_name, album.song_path[0:album.song_path.rfind("/")], album.duration])
+            info.append([album.song_name, album.song_path, album.duration])
         self.info_table.setRowCount(len(info))
 
         for row in range(len(info)):
