@@ -352,7 +352,7 @@ class SaveAlbum(QDialog):
 class Information(QDialog):
     def __init__(self, album) -> None:
         super().__init__()
-        self.info_table = QtWidgets.QTableWidget
+
         uic.loadUi("DIALOG/info.ui", self)
         self.setFixedSize(881, 596)
 
