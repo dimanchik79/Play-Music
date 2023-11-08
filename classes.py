@@ -87,7 +87,16 @@ class MainClass(QMainWindow):
 
     def delete_song(self):
         # TODO удаление песни из списка
-        print("bzbz")
+        if not self.id:
+            return
+        if self.start:
+            self.press_stop_button()
+        row = self.playlist.row(self.playlist.currentItem())
+        PlayList.delete().where(PlayList.id == self.id[row]).execute()
+
+        self.update_playlist()
+        self.playlist.setCurrentRow(row if row < self.playlist.count() else row - 1)
+        self.playlist.setFocus()
 
     def volume_change(self):
         if self.start:
@@ -166,7 +175,7 @@ class MainClass(QMainWindow):
             return
 
     def press_play_button(self) -> None:
-        if self.play_list == {}:
+        if not self.id:
             return
         if not self.start:
             self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
@@ -203,9 +212,9 @@ class MainClass(QMainWindow):
             pygame.mixer.music.unpause()
 
     def update_playlist(self):
-        album = []
-        self.id = []
+        album, self.id = [], []
         self.playlist.clear()
+        self.play_list = {}
         self.count = 0
         for row in PlayList.select():
             if os.path.exists(f"{row.song_path}"):
@@ -216,6 +225,7 @@ class MainClass(QMainWindow):
                 self.id.append(row.id)
         self.total_songs = len(self.play_list)
         self.number.setText(str(self.total_songs))
+
         for key, word in self.play_list.items():
             album.append(word[4])
         self.album = ", ".join(set(album))
@@ -224,7 +234,6 @@ class MainClass(QMainWindow):
             self.album_txt.setStyleSheet("border: 1px solid rgb(85, 0, 0);border-radius: 5px;color: rgb(255, 0, 0);")
         else:
             self.album_txt.setStyleSheet("border: 1px solid rgb(85, 0, 0);border-radius: 5px;color: rgb(0, 0, 0);")
-        self.album_txt.setToolTip = self.album_txt.text()
 
     def play_music(self):
         while True:
