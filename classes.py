@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem
 
 from bs4 import BeautifulSoup
 from tinytag import TinyTag
+from functools import lru_cache
 
 from models import PlayList, Albums
 
@@ -26,11 +27,13 @@ def get_time(duration: float) -> str:
     return f"{hour:}:{minute}:{second[0:] if len(second) < 3 else second[1:]}"
 
 
+@lru_cache()
 def get_news() -> list:
     """Функция парсит сайт и возвращает список с анонсами новостей"""
     news = []
-    response = requests.get("https://lenta.ru/parts/news/")
-    if response.status_code >= 400:
+    try:
+        response = requests.get("https://lenta.ru/parts/news/")
+    except:
         news.append("Check your Internet connect ...")
         return news
     response = response.text
@@ -46,8 +49,11 @@ class MainClass(QMainWindow):
     play_list: dict -
 
     """
-    def __init__(self) -> None:
+
+    def __init__(self, directory, files) -> None:
         super().__init__()
+        self.directory = directory
+        self.files = files
         self.open_window = None
         (self.play_list, self.pause, self.start, self.duration,
          self.duration_sec, self.duration_old, self.song_id,
@@ -76,7 +82,11 @@ class MainClass(QMainWindow):
         self.open.clicked.connect(self.open_playlist)
         self.clear.clicked.connect(self.clear_playlist)
 
-        self.update_playlist()
+        if self.files:
+            self.file_add()
+        else:
+            self.update_playlist()
+
         self.playlist.setCurrentRow(self.count)
         self.playlist.setFocus()
 
@@ -155,9 +165,17 @@ class MainClass(QMainWindow):
             self.volume.setEnabled(True)
 
     def file_add(self):
-        songs = QtWidgets.QFileDialog.getOpenFileNames(filter="*.mp3 *.wav")[0]
+        songs = []
+
+        if not self.files:
+            songs = QtWidgets.QFileDialog.getOpenFileNames(filter="*.mp3 *.wav")[0]
+        else:
+            for song in self.files:
+                songs.append(f"{self.directory}/{song}")
+                PlayList.delete().execute()
         if not songs:
             return
+
         for song_file in songs:
             song = TinyTag.get(song_file)
             text_name = song_file[song_file.rindex("/") + 1:]
@@ -253,9 +271,9 @@ class MainClass(QMainWindow):
                 pass
             else:
                 if self.start:
-                    mins, secs = divmod(int(self.duration_sec), 60)
-                    hour, mins = divmod(int(mins), 60)
-                    self.clock.setText(f'{hour:02d}:{mins:02d}:{secs:02d}')
+                    temp, secs = divmod(int(self.duration_sec), 60)
+                    hours, minuts = divmod(int(temp), 60)
+                    self.clock.setText(f'{hours:02d}:{minuts:02d}:{secs:02d}')
                     self.duration_sec -= 1
                     if pygame.mixer.music.get_pos() == -1:
                         self.next_song()

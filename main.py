@@ -7,11 +7,12 @@ from classes import MainClass
 
 
 def main():
-    _, *files = sys.argv
-    print(*files, sep="\n")
+    dir_dir, *files = sys.argv
+    dir_dir = dir_dir.replace(chr(92), chr(47))
+    dir_dir = dir_dir[0:dir_dir.rfind("/")]
 
     app = QApplication(sys.argv)
-    main_window = MainClass()
+    main_window = MainClass(dir_dir, files)
     main_window.show()
     sys.exit(app.exec())
 
