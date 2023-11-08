@@ -18,7 +18,7 @@ pygame.mixer.init()
 
 
 def get_time(duration: float) -> str:
-    """Функция преобразует число в формат 00:00:00"""
+    """Функция преобразует полученную длину песни в формат 00:00:00"""
     duration /= 1000
     second = f"{0}{int(duration % 60)}"
     minute = '00' if (duration % 60) == 0 else f"{0}{int(duration / 60)}"
@@ -42,6 +42,10 @@ def get_news() -> list:
 
 
 class MainClass(QMainWindow):
+    """Модель инициализации интерфейса плейера
+    play_list: dict -
+
+    """
     def __init__(self) -> None:
         super().__init__()
         self.open_window = None
@@ -85,8 +89,8 @@ class MainClass(QMainWindow):
         threading.Thread(target=self.run_string, args=(), daemon=True).start()
         threading.Thread(target=self.play_music, args=(), daemon=True).start()
 
-    def delete_song(self):
-        # TODO удаление песни из списка
+    def delete_song(self) -> None:
+        """Метод удаляет одну песню из списка воспроизведения"""
         if not self.id:
             return
         if self.start:
@@ -98,29 +102,34 @@ class MainClass(QMainWindow):
         self.playlist.setCurrentRow(row if row < self.playlist.count() else row - 1)
         self.playlist.setFocus()
 
-    def volume_change(self):
+    def volume_change(self) -> None:
+        """Метод устанавливает громкость песни"""
         if self.start:
             pygame.mixer.music.set_volume(self.volume.value() / 100)
 
-    def closeEvent(self, event):
+    def closeEvent(self, event) -> None:
+        """Метод вызывает метод выхода из программы"""
         self.exit_program()
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event) -> None:
+        """Метод реализует обработку нажатия клавиши Enter"""
         if event.key() == Qt.Key_Return:
             self.bind_tree_change_song()
 
-    def bind_tree_change_song(self):
+    def bind_tree_change_song(self) -> None:
+        """Метод реализует смену песни"""
         self.press_stop_button()
         self.press_play_button()
 
-    def thread_soft_volume_off(self):
+    def thread_soft_volume_off(self) -> None:
+        """Метод реализует в потоке процедуру мягкой смены громкости звука"""
         for process in threading.enumerate():
             if process.name.count("soft_volume_off"):
                 return
         else:
             threading.Thread(target=self.soft_volume_off, args=(), daemon=True).start()
 
-    def soft_volume_off(self):
+    def soft_volume_off(self) -> None:
         if self.soft.checkState() == 2:
             self.soft.setEnabled(False)
             self.volume.setEnabled(False)
@@ -245,7 +254,8 @@ class MainClass(QMainWindow):
             else:
                 if self.start:
                     mins, secs = divmod(int(self.duration_sec), 60)
-                    self.clock.setText(f'{mins:02d}:{secs:02d}')
+                    hour, mins = divmod(int(mins), 60)
+                    self.clock.setText(f'{hour:02d}:{mins:02d}:{secs:02d}')
                     self.duration_sec -= 1
                     if pygame.mixer.music.get_pos() == -1:
                         self.next_song()
