@@ -30,7 +30,7 @@ def get_news() -> list:
     """Функция парсит сайт и возвращает список с анонсами новостей"""
     news = []
     response = requests.get("https://lenta.ru/parts/news/")
-    if response.status_code > 400:
+    if response.status_code >= 400:
         news.append("Check your Internet connect ...")
         return news
     response = response.text
