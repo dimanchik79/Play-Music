@@ -50,10 +50,8 @@ class MainClass(QMainWindow):
 
     """
 
-    def __init__(self, directory, files) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.directory = directory
-        self.files = files
         self.open_window = None
         (self.play_list, self.pause, self.start, self.duration,
          self.duration_sec, self.duration_old, self.song_id,
@@ -82,11 +80,7 @@ class MainClass(QMainWindow):
         self.open.clicked.connect(self.open_playlist)
         self.clear.clicked.connect(self.clear_playlist)
 
-        if self.files:
-            self.file_add()
-        else:
-            self.update_playlist()
-
+        self.update_playlist()
         self.playlist.setCurrentRow(self.count)
         self.playlist.setFocus()
 
@@ -166,16 +160,6 @@ class MainClass(QMainWindow):
 
     def file_add(self):
         songs = []
-
-        if not self.files:
-            songs = QtWidgets.QFileDialog.getOpenFileNames(filter="*.mp3 *.wav")[0]
-        else:
-            for song in self.files:
-                songs.append(f"{self.directory}/{song}")
-                PlayList.delete().execute()
-        if not songs:
-            return
-
         for song_file in songs:
             song = TinyTag.get(song_file)
             text_name = song_file[song_file.rindex("/") + 1:]
