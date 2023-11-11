@@ -222,7 +222,6 @@ class MainClass(QMainWindow):
             self.pause = False
             pygame.mixer.music.unpause()
 
-
     def update_playlist(self):
         album, self.id = [], []
         self.playlist.clear()
