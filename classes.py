@@ -12,7 +12,6 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem, QFileDialog
 
 from bs4 import BeautifulSoup
 from tinytag import TinyTag
-from functools import lru_cache
 
 from models import PlayList, Albums
 
@@ -30,7 +29,6 @@ def get_time(duration: float) -> str:
     return f'{hours:02d}:{minuts:02d}:{secs:02d}'
 
 
-@lru_cache
 def get_news() -> list:
     """Функция парсит сайт и возвращает список с анонсами новостей"""
     news = []
