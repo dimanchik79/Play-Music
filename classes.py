@@ -4,10 +4,11 @@ import threading
 
 import pygame
 import requests
+import webbrowser
 
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem, QFileDialog
 
 from bs4 import BeautifulSoup
 from tinytag import TinyTag
@@ -18,16 +19,18 @@ from models import PlayList, Albums
 pygame.mixer.init()
 
 
+def show_git():
+    webbrowser.open("https://github.com/dimanchik79/Player-Music", new=0, autoraise=True)
+
+
 def get_time(duration: float) -> str:
     """Функция преобразует полученную длину песни в формат 00:00:00"""
-    duration /= 1000
-    second = f"{0}{int(duration % 60)}"
-    minute = '00' if (duration % 60) == 0 else f"{0}{int(duration / 60)}"
-    hour = '00' if (duration % 3600) == 0 else f"{0}{int(duration / 3600)}"
-    return f"{hour:}:{minute}:{second[0:] if len(second) < 3 else second[1:]}"
+    temp, secs = divmod(int(duration / 1000), 60)
+    hours, minuts = divmod(int(temp), 60)
+    return f'{hours:02d}:{minuts:02d}:{secs:02d}'
 
 
-@lru_cache()
+@lru_cache
 def get_news() -> list:
     """Функция парсит сайт и возвращает список с анонсами новостей"""
     news = []
@@ -65,6 +68,7 @@ class MainClass(QMainWindow):
         self.setFixedSize(501, 648)
 
         self.volume.valueChanged.connect(self.volume_change)
+        self.git.clicked.connect(show_git)
         self.add.clicked.connect(self.file_add)
         self.del_song.clicked.connect(self.delete_song)
         self.play.clicked.connect(self.press_play_button)
@@ -159,7 +163,9 @@ class MainClass(QMainWindow):
             self.volume.setEnabled(True)
 
     def file_add(self):
-        songs = []
+        songs = QFileDialog.getOpenFileNames(self, "Open Music files", "", "Music Files (*.mp3 *.wav)")[0]
+        if not songs:
+            return
         for song_file in songs:
             song = TinyTag.get(song_file)
             text_name = song_file[song_file.rindex("/") + 1:]
@@ -255,9 +261,7 @@ class MainClass(QMainWindow):
                 pass
             else:
                 if self.start:
-                    temp, secs = divmod(int(self.duration_sec), 60)
-                    hours, minuts = divmod(int(temp), 60)
-                    self.clock.setText(f'{hours:02d}:{minuts:02d}:{secs:02d}')
+                    self.clock.setText(get_time(self.duration_sec * 1000))
                     self.duration_sec -= 1
                     if pygame.mixer.music.get_pos() == -1:
                         self.next_song()
