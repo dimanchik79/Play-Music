@@ -205,6 +205,7 @@ class MainClass(QMainWindow):
             self.song_id_old = self.song_id
             self.playlist.item(self.count).setForeground(QtGui.QColor('blue'))
             self.clock.setText(self.duration)
+            self.number.setText(f"{self.count + 1}/{self.total_songs}")
             pygame.mixer.music.load(path_file)
             pygame.mixer.music.play(loops=0)
             pygame.mixer.music.set_volume(self.volume.value() / 100)
@@ -249,6 +250,7 @@ class MainClass(QMainWindow):
             time.sleep(1)
             if not self.start:
                 self.clock.setText('---')
+                self.number.setText(f"{self.total_songs}")
             if self.pause:
                 pass
             else:
@@ -315,6 +317,8 @@ class MainClass(QMainWindow):
         self.playlist.setFocus()
 
     def clear_playlist(self):
+        if not self.id:
+            return
         PlayList.delete().execute()
         self.press_stop_button()
         self.play_list = {}

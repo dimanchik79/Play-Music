@@ -9,7 +9,7 @@ from classes import MainClass
 def main():
     _, *file = sys.argv
     with open("temp.txt", 'w') as tmp:
-        tmp.write(f"{path.expanduser('~')} *** {str(file)}")
+        tmp.write(f"{_} *** {str(file)}")
 
     app = QApplication(sys.argv)
     main_window = MainClass()
