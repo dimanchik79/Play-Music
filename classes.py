@@ -408,16 +408,15 @@ class OpenAlbum(QDialog):
     def __init__(self) -> None:
         super().__init__()
         self.info = None
+        self.playlists = []
 
         uic.loadUi("DIALOG/open.ui", self)
         self.setFixedSize(400, 428)
         self.r_open.setChecked(True)
         self.see.clicked.connect(self.album_information)
-
-        self.playlists = [row.album for row in Albums.select()]
-        if len(self.playlists) != 0:
-            for album in set(self.playlists):
-                self.albums.addItem(album)
+        self.erase.clicked.connect(self.erase_album)
+        self. update_albums()
+        if self.playlists:
             self.albums.setCurrentRow(0)
             self.albums.setFocus()
 
@@ -425,3 +424,21 @@ class OpenAlbum(QDialog):
         self.info = Information(self.albums.currentItem().text())
         self.info.show()
         self.info.exec_()
+
+    def erase_album(self):
+        if not self.playlists:
+            return
+        row = self.albums.row(self.albums.currentItem())
+        Albums.delete().where(Albums.album == self.albums.currentItem().text()).execute()
+        self.update_albums()
+        if not self.playlists:
+            self.albums.setCurrentRow(row if row < self.playlist.count() else row - 1)
+            self.albums.setFocus()
+
+    def update_albums(self):
+        self.playlists.clear()
+        self.playlists = [row.album for row in Albums.select()]
+        for album in set(self.playlists):
+            self.albums.addItem(album)
+
+
