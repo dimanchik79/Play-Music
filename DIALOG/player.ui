@@ -510,7 +510,7 @@ border-radius: 5px;
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>120</x>
       <y>60</y>
       <width>261</width>
       <height>61</height>
@@ -531,8 +531,8 @@ border-radius: 5px;
    <widget class="QPushButton" name="git">
     <property name="geometry">
      <rect>
-      <x>217</x>
-      <y>9</y>
+      <x>220</x>
+      <y>10</y>
       <width>51</width>
       <height>51</height>
      </rect>

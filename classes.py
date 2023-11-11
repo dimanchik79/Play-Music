@@ -43,7 +43,7 @@ def get_news() -> list:
     soup = BeautifulSoup(response, 'lxml')
     block = soup.find_all('h3')
     for row in block:
-        news.append(row.text + ' (РИА НОВОСТИ) ... ')
+        news.append(row.text + ' (LENTA.RU) ... ')
     return news
 
 
@@ -196,7 +196,6 @@ class MainClass(QMainWindow):
             return
         if not self.start:
             self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
-            self.play.setIconSize(QtCore.QSize(28, 28))
             self.count = self.playlist.currentIndex().row()
             key = self.id[self.count]
             path_file = self.play_list[key][1]
@@ -207,26 +206,22 @@ class MainClass(QMainWindow):
             self.song_id = self.count
             self.song_id_old = self.song_id
             self.playlist.item(self.count).setForeground(QtGui.QColor('blue'))
-
             self.clock.setText(self.duration)
-
             pygame.mixer.music.load(path_file)
             pygame.mixer.music.play(loops=0)
-
             pygame.mixer.music.set_volume(self.volume.value() / 100)
             self.start = True
             return
 
         if not self.pause:
             self.play.setIcon(QtGui.QIcon("IMG/play.ico"))
-            self.play.setIconSize(QtCore.QSize(28, 28))
             self.pause = True
             pygame.mixer.music.pause()
         else:
             self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
-            self.play.setIconSize(QtCore.QSize(28, 28))
             self.pause = False
             pygame.mixer.music.unpause()
+
 
     def update_playlist(self):
         album, self.id = [], []
