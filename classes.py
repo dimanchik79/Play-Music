@@ -252,7 +252,7 @@ class MainClass(QMainWindow):
                 self.clock.setText('---')
                 self.number.setText(f"{self.total_songs}")
             if self.pause:
-                pass
+                self.clock.setText('pause')
             else:
                 if self.start:
                     self.clock.setText(get_time(self.duration_sec * 1000))
