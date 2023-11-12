@@ -442,5 +442,3 @@ class OpenAlbum(QDialog):
         self.playlists = [row.album for row in Albums.select()]
         for album in set(self.playlists):
             self.albums.addItem(album)
-
-
