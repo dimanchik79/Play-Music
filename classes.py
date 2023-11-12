@@ -416,6 +416,7 @@ class OpenAlbum(QDialog):
         self.see.clicked.connect(self.album_information)
         self.erase.clicked.connect(self.erase_album)
         self. update_albums()
+
         if self.playlists:
             self.albums.setCurrentRow(0)
             self.albums.setFocus()
