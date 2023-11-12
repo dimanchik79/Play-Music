@@ -390,8 +390,8 @@ class Information(QDialog):
 
         self.info_table.setColumnCount(3)
         self.info_table.setHorizontalHeaderLabels(["File", "Path", "Duration"])
-        self.info_table.setColumnWidth(0, 400)
-        self.info_table.setColumnWidth(1, 300)
+        self.info_table.setColumnWidth(0, 300)
+        self.info_table.setColumnWidth(1, 400)
 
         for album in Albums.select().where(Albums.album == album):
             info.append([album.song_name, album.song_path, album.duration])
@@ -431,12 +431,13 @@ class OpenAlbum(QDialog):
         row = self.albums.row(self.albums.currentItem())
         Albums.delete().where(Albums.album == self.albums.currentItem().text()).execute()
         self.update_albums()
-        if not self.playlists:
-            self.albums.setCurrentRow(row if row < self.playlist.count() else row - 1)
+        if self.playlists:
+            self.albums.setCurrentRow(row if row < self.albums.count() else row - 1)
             self.albums.setFocus()
 
     def update_albums(self):
         self.playlists.clear()
+        self.albums.clear()
         self.playlists = [row.album for row in Albums.select()]
         for album in set(self.playlists):
             self.albums.addItem(album)
