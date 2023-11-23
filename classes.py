@@ -286,6 +286,8 @@ class MainClass(QMainWindow):
         self.close()
 
     def save_playlist(self):
+        if not self.id:
+            return
         self.save_window = SaveAlbum(self.album)
         self.save_window.show()
         self.save_window.exec_()
