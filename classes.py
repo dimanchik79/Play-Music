@@ -178,6 +178,8 @@ class MainClass(QMainWindow):
         self.playlist.setFocus()
 
     def press_stop_button(self) -> None:
+        if not self.id:
+            return
         try:
             self.start = False
             self.pause = False
@@ -298,7 +300,7 @@ class MainClass(QMainWindow):
         self.open_window = OpenAlbum()
         self.open_window.show()
         self.open_window.exec_()
-        if self.open_window.result() == 1:
+        if self.open_window.result() == 1 and self.open_window.playlists:
             self.open_album()
 
     def open_album(self):
@@ -417,13 +419,15 @@ class OpenAlbum(QDialog):
         self.r_open.setChecked(True)
         self.see.clicked.connect(self.album_information)
         self.erase.clicked.connect(self.erase_album)
-        self. update_albums()
+        self.update_albums()
 
         if self.playlists:
             self.albums.setCurrentRow(0)
             self.albums.setFocus()
 
     def album_information(self):
+        if not self.playlists:
+            return
         self.info = Information(self.albums.currentItem().text())
         self.info.show()
         self.info.exec_()
