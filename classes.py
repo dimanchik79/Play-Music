@@ -119,7 +119,7 @@ class MainClass(QMainWindow):
 
     def keyPressEvent(self, event) -> None:
         """Метод реализует обработку нажатия клавиши Enter"""
-        if event.key() == Qt.Key_Return:
+        if event.key() in (Qt.Key_Enter, Qt.Key_Return):
             self.bind_tree_change_song()
 
     def bind_tree_change_song(self) -> None:
