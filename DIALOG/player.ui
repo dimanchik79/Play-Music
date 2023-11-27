@@ -494,7 +494,7 @@ border-radius: 5px;
      <enum>QFrame::Raised</enum>
     </property>
     <property name="lineWidth">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="midLineWidth">
      <number>0</number>
@@ -513,49 +513,68 @@ border-radius: 5px;
      <string notr="true">background-color: rgb(241, 255, 239)</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>60</y>
-      <width>261</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>28</pointsize>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string>Music Player</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="git">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
+      <x>10</x>
       <y>10</y>
-      <width>51</width>
-      <height>51</height>
+      <width>481</width>
+      <height>121</height>
      </rect>
     </property>
-    <property name="text">
-     <string/>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
     </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>../IMG/icon.ico</normaloff>../IMG/icon.ico</iconset>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
-    <property name="iconSize">
-     <size>
-      <width>48</width>
-      <height>48</height>
-     </size>
+    <property name="midLineWidth">
+     <number>1</number>
     </property>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>53</y>
+       <width>261</width>
+       <height>60</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>28</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string>Music Player</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="git">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>10</y>
+       <width>51</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../IMG/icon.ico</normaloff>../IMG/icon.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>48</width>
+       <height>48</height>
+      </size>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>
