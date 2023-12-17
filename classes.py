@@ -128,7 +128,7 @@ class MainClass(QMainWindow):
         self.press_play_button()
 
     def thread_soft_volume_off(self) -> None:
-        """Метод реализует в потоке процедуру мягкой смены громкости звука"""
+        """Метод вызывает в потоке процедуру мягкой смены громкости звука"""
         for process in threading.enumerate():
             if process.name.count("soft_volume_off"):
                 return
@@ -136,6 +136,7 @@ class MainClass(QMainWindow):
             threading.Thread(target=self.soft_volume_off, args=(), daemon=True).start()
 
     def soft_volume_off(self) -> None:
+        """Метод реализует мягкую смены громкости звука"""
         if self.soft.checkState() == 2:
             self.soft.setEnabled(False)
             self.volume.setEnabled(False)
@@ -161,6 +162,7 @@ class MainClass(QMainWindow):
             self.volume.setEnabled(True)
 
     def file_add(self):
+        """Метод реализует добавление песен из файлов"""
         songs = QFileDialog.getOpenFileNames(self, "Open Music files", "", "Music Files (*.mp3 *.wav)")[0]
         if not songs:
             return
@@ -178,6 +180,7 @@ class MainClass(QMainWindow):
         self.playlist.setFocus()
 
     def press_stop_button(self) -> None:
+        """Метод обрабатывает нажатие на кнопку Стоп"""
         if not self.id:
             return
         try:
@@ -192,6 +195,7 @@ class MainClass(QMainWindow):
             return
 
     def press_play_button(self) -> None:
+        """Метод обрабатывает нажатие на кнопку Плай"""
         if not self.id:
             return
         if not self.start:
@@ -224,6 +228,7 @@ class MainClass(QMainWindow):
             pygame.mixer.music.unpause()
 
     def update_playlist(self):
+        """Метод реализует обновление списка воспроизведения"""
         album, self.id = [], []
         self.playlist.clear()
         self.play_list = {}
@@ -248,6 +253,7 @@ class MainClass(QMainWindow):
             self.album_txt.setStyleSheet("border: 1px solid rgb(85, 0, 0);border-radius: 5px;color: rgb(0, 0, 0);")
 
     def play_music(self):
+        """Метод реализует отсчет таймера и проверяет окончание песни"""
         while True:
             time.sleep(1)
             if not self.start:
@@ -263,25 +269,28 @@ class MainClass(QMainWindow):
                         self.next_song()
 
     def next_song(self):
+        """Метод увеличивает счетчик песен на 1"""
         if self.count < self.total_songs - 1:
             self.count += 1
         else:
             self.count = 0
-        self.next_back()
-
-    def next_back(self):
-        self.press_stop_button()
-        self.playlist.setCurrentRow(self.count)
-        self.press_play_button()
+        self.next_play()
 
     def back_song(self):
+        """Метод уменьшает счетчик песен на 1"""
         if self.count > 0:
             self.count -= 1
         else:
             self.count = self.total_songs - 1
-        self.next_back()
+        self.next_play()
+
+    def next_play(self):
+        self.press_stop_button()
+        self.playlist.setCurrentRow(self.count)
+        self.press_play_button()
 
     def exit_program(self):
+        """Метод закрывает окно программы"""
         self.pause = True
         pygame.mixer.music.stop()
         pygame.mixer.music.unload()
