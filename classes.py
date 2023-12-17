@@ -393,7 +393,7 @@ class Information(QDialog):
         info = []
 
         self.info_table.setColumnCount(3)
-        self.info_table.setHorizontalHeaderLabels(["File", "Path", "Duration"])
+        self.info_table.setHorizontalHeaderLabels(["Song", "Path", "Duration"])
         self.info_table.setColumnWidth(0, 300)
         self.info_table.setColumnWidth(1, 400)
 
