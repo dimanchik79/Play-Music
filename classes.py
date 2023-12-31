@@ -6,14 +6,14 @@ import pygame
 import requests
 import webbrowser
 
+from bs4 import BeautifulSoup
+from tinytag import TinyTag
+from models import PlayList, Albums
+
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem, QFileDialog
 
-from bs4 import BeautifulSoup
-from tinytag import TinyTag
-
-from models import PlayList, Albums
 
 pygame.mixer.init()
 
@@ -37,8 +37,7 @@ def get_news() -> list:
     except:
         news.append("Check your Internet connect ...")
         return news
-    response = response.text
-    soup = BeautifulSoup(response, 'lxml')
+    soup = BeautifulSoup(response.text, 'lxml')
     block = soup.find_all('h3')
     for row in block:
         news.append(row.text + ' (LENTA.RU) ... ')
@@ -285,6 +284,7 @@ class MainClass(QMainWindow):
         self.next_play()
 
     def next_play(self):
+        """Метод иницилизирует проигрывание следующей песни"""
         self.press_stop_button()
         self.playlist.setCurrentRow(self.count)
         self.press_play_button()
@@ -297,6 +297,7 @@ class MainClass(QMainWindow):
         self.close()
 
     def save_playlist(self):
+        """Метод вызывает диалог записи плей-листа"""
         if not self.id:
             return
         self.save_window = SaveAlbum(self.album)
@@ -306,6 +307,7 @@ class MainClass(QMainWindow):
             self.save_album()
 
     def open_playlist(self):
+        """Метод вызывает диалог открытия плей-листа"""
         self.open_window = OpenAlbum()
         self.open_window.show()
         self.open_window.exec_()
@@ -313,6 +315,7 @@ class MainClass(QMainWindow):
             self.open_album()
 
     def open_album(self):
+        """Метод вызывает открытия плей-листа"""
         if self.start:
             self.press_stop_button()
         if self.open_window.r_open.isChecked():
@@ -330,6 +333,7 @@ class MainClass(QMainWindow):
         self.playlist.setFocus()
 
     def clear_playlist(self):
+        """Метод очистки плей-листа"""
         if not self.id:
             return
         PlayList.delete().execute()
@@ -338,6 +342,7 @@ class MainClass(QMainWindow):
         self.update_playlist()
 
     def save_album(self):
+        """Метод записи плей-листа"""
         Albums.delete().where(Albums.album == self.save_window.name.text()).execute()
         PlayList.delete().execute()
         for key, word in self.play_list.items():
@@ -358,6 +363,7 @@ class MainClass(QMainWindow):
         self.playlist.setCurrentRow(self.count)
 
     def run_string(self):
+        """Метод вызывает бегущую строку"""
         while True:
             try:
                 self.news_text.setGeometry(self.x_pos, 8, len(self.news[self.news_count]) * 8, 12)
@@ -375,6 +381,7 @@ class MainClass(QMainWindow):
 
 
 class SaveAlbum(QDialog):
+    """Класс инициализирует диалоговон окно записи плей-листа"""
     def __init__(self, album) -> None:
         super().__init__()
         self.album = album
