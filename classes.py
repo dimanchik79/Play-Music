@@ -166,14 +166,17 @@ class MainClass(QMainWindow):
         if not songs:
             return
         for song_file in songs:
-            song = TinyTag.get(song_file)
-            text_name = song_file[song_file.rindex("/") + 1:]
-            text_time = f"{get_time(song.duration * 1000)}"
-            PlayList.create(song_name=text_name,
-                            song_path=song_file,
-                            duration=text_time,
-                            duration_sec=song.duration,
-                            album=self.p_text if self.p_text != "" else "*")
+            try:
+                song = TinyTag.get(song_file)
+                text_name = song_file[song_file.rindex("/") + 1:]
+                text_time = f"{get_time(song.duration * 1000)}"
+                PlayList.create(song_name=text_name,
+                                song_path=song_file,
+                                duration=text_time,
+                                duration_sec=song.duration,
+                                album=self.p_text if self.p_text != "" else "*")
+            except Exception:
+                continue
         self.update_playlist()
         self.playlist.setCurrentRow(self.count)
         self.playlist.setFocus()
@@ -377,7 +380,7 @@ class MainClass(QMainWindow):
                         self.news_count = 0
                 self.news_text.setText(self.news[self.news_count])
             except RuntimeError:
-                break
+                continue
 
 
 class SaveAlbum(QDialog):
