@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import threading
 
@@ -66,7 +67,7 @@ class MainClass(QMainWindow):
         show_action = QAction("Show Player", self)
         show_action.triggered.connect(self.show)
         exit_action = QtWidgets.QAction("Exit", self)
-        exit_action.triggered.connect(qApp.quit)
+        exit_action.triggered.connect(self.exit_program)
 
         tray_menu = QMenu(self)
         tray_menu.addAction(show_action)
@@ -109,6 +110,14 @@ class MainClass(QMainWindow):
 
         threading.Thread(target=self.run_string, args=(), daemon=True).start()
         threading.Thread(target=self.play_music, args=(), daemon=True).start()
+
+    def exit_program(self):
+        """Метод закрывает окно программы"""
+        self.pause = True
+        pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
+        sys.exit()
+
 
     def delete_song(self) -> None:
         """Метод удаляет одну песню из списка воспроизведения"""
@@ -308,13 +317,6 @@ class MainClass(QMainWindow):
         self.press_stop_button()
         self.playlist.setCurrentRow(self.count)
         self.press_play_button()
-
-    def exit_program(self):
-        """Метод закрывает окно программы"""
-        self.pause = True
-        pygame.mixer.music.stop()
-        pygame.mixer.music.unload()
-        self.close()
 
     def save_playlist(self):
         """Метод вызывает диалог записи плей-листа"""
