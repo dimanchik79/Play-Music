@@ -12,13 +12,13 @@ from models import PlayList, Albums
 
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem, QFileDialog
-
+from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem, QFileDialog, qApp, QMenu, QAction
 
 pygame.mixer.init()
 
 
 def show_git():
+    """Функция открывает страницу на github"""
     webbrowser.open("https://github.com/dimanchik79/Player-Music", new=0, autoraise=True)
 
 
@@ -34,7 +34,7 @@ def get_news() -> list:
     news = []
     try:
         response = requests.get("https://lenta.ru/parts/news/")
-    except:
+    except Exception:
         news.append("Check your Internet connect ...")
         return news
     soup = BeautifulSoup(response.text, 'lxml')
@@ -59,6 +59,22 @@ class MainClass(QMainWindow):
          self.p_text, self.save_window, self.count, self.id,
          self.album, self.news_count, self.x_pos) = [{}, False, False, None, None, None, None, 0, 0, 0, 0, "", None, 0,
                                                      [], "", 0, 481]
+
+        self.tray_icon = QtWidgets.QSystemTrayIcon(self)
+        self.tray_icon.setIcon(QtGui.QIcon("IMG/icon.ico"))
+
+        show_action = QAction("Show Player", self)
+        show_action.triggered.connect(self.show)
+        exit_action = QtWidgets.QAction("Exit", self)
+        exit_action.triggered.connect(qApp.quit)
+
+        tray_menu = QMenu(self)
+        tray_menu.addAction(show_action)
+        tray_menu.addAction(exit_action)
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.show()
+
+        self.tray_icon.show()
 
         uic.loadUi("DIALOG/player.ui", self)
 
@@ -114,7 +130,8 @@ class MainClass(QMainWindow):
 
     def closeEvent(self, event) -> None:
         """Метод вызывает метод выхода из программы"""
-        self.exit_program()
+        event.ignore()  # Не вызывать метод closeEvent
+        self.hide()
 
     def keyPressEvent(self, event) -> None:
         """Метод реализует обработку нажатия клавиши Enter"""
@@ -385,6 +402,7 @@ class MainClass(QMainWindow):
 
 class SaveAlbum(QDialog):
     """Класс инициализирует диалоговон окно записи плей-листа"""
+
     def __init__(self, album) -> None:
         super().__init__()
         self.album = album

@@ -6,7 +6,8 @@ from models import PlayList, Albums
 from classes import MainClass
 
 
-def main():
+def main() -> None:
+    """Звпуск основного окна"""
     app = QApplication(sys.argv)
     main_window = MainClass()
     main_window.show()
@@ -14,6 +15,7 @@ def main():
 
 
 if __name__ == "__main__":
+    # Создание таблиц в БД
     if not path.exists('DB/playlist.db'):
         PlayList.create_table()
         Albums.create_table()

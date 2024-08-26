@@ -12,6 +12,7 @@ class BaseModel(Model):
 
 
 class PlayList(BaseModel):
+    """Модель базы данных"""
     song_name = CharField(max_length=250)
     song_path = CharField(max_length=250)
     duration = CharField(max_length=8)
@@ -20,6 +21,7 @@ class PlayList(BaseModel):
 
 
 class Albums(BaseModel):
+    """Модель альбомов"""
     song_name = CharField(max_length=250)
     song_path = CharField(max_length=250)
     duration = CharField(max_length=8)
