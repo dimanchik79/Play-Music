@@ -13,7 +13,18 @@ from models import PlayList, Albums
 
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem, QFileDialog, qApp, QMenu, QAction
+from PyQt5.QtWidgets import QMainWindow, QDialog, QTableWidgetItem, QFileDialog, QAction, QMenu
+
+
+TRAY_STYLE = """
+        color: black;
+        background-color: rgb(255, 255, 246);
+        font-size: 16px;
+        font-weight: bold;
+"""
+
+TRAY_STYLE += "QMenu::item:hover { background-color: black; color: white; }"
+
 
 pygame.mixer.init()
 
@@ -70,6 +81,7 @@ class MainClass(QMainWindow):
         exit_action.triggered.connect(self.exit_program)
 
         tray_menu = QMenu(self)
+        tray_menu.setStyleSheet(TRAY_STYLE)
         tray_menu.addAction(show_action)
         tray_menu.addAction(exit_action)
         self.tray_icon.setContextMenu(tray_menu)
