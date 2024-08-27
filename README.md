@@ -5,5 +5,8 @@
 This is a music player designed to play mp3 and wav files.
 You can also create and save playlists in it.
 
+DOWNLOAD
+-------------------------------------------------------------------------
+https://disk.yandex.ru/d/cuIgCw3vm0Nugw
 
 
