@@ -72,23 +72,6 @@ class MainClass(QMainWindow):
          self.album, self.news_count, self.x_pos) = [{}, False, False, None, None, None, None, 0, 0, 0, 0, "", None, 0,
                                                      [], "", 0, 481]
 
-        self.tray_icon = QtWidgets.QSystemTrayIcon(self)
-        self.tray_icon.setIcon(QtGui.QIcon("IMG/icon.ico"))
-
-        show_action = QAction("Show Player", self)
-        show_action.triggered.connect(self.show)
-        exit_action = QtWidgets.QAction("Exit", self)
-        exit_action.triggered.connect(self.exit_program)
-
-        tray_menu = QMenu(self)
-        tray_menu.setStyleSheet(TRAY_STYLE)
-        tray_menu.addAction(show_action)
-        tray_menu.addAction(exit_action)
-        self.tray_icon.setContextMenu(tray_menu)
-        self.tray_icon.show()
-
-        self.tray_icon.show()
-
         uic.loadUi("DIALOG/player.ui", self)
 
         self.setFixedSize(501, 648)
@@ -120,8 +103,28 @@ class MainClass(QMainWindow):
         self.news_text.setText(self.news[self.news_count])
         self.news_text.setStyleSheet("color: black; border: 0;")
 
+        self.tray_icon = QtWidgets.QSystemTrayIcon(self)
+        self.tray_icon.setIcon(QtGui.QIcon("IMG/icon.ico"))
+        self.tray_icon.activated.connect(self.onTrayIconActivated)
+
+        show_action = QAction("Show Player", self)
+        show_action.triggered.connect(self.show)
+        exit_action = QtWidgets.QAction("Exit", self)
+        exit_action.triggered.connect(self.exit_program)
+
+        tray_menu = QMenu(self)
+        tray_menu.setStyleSheet(TRAY_STYLE)
+        tray_menu.addAction(show_action)
+        tray_menu.addAction(exit_action)
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.show()
+
         threading.Thread(target=self.run_string, args=(), daemon=True).start()
         threading.Thread(target=self.play_music, args=(), daemon=True).start()
+
+    def onTrayIconActivated(self, reason) -> None:
+        if reason == QtWidgets.QSystemTrayIcon.DoubleClick:
+            self.show()
 
     def exit_program(self):
         """Метод закрывает окно программы"""
@@ -129,7 +132,6 @@ class MainClass(QMainWindow):
         pygame.mixer.music.stop()
         pygame.mixer.music.unload()
         sys.exit()
-
 
     def delete_song(self) -> None:
         """Метод удаляет одну песню из списка воспроизведения"""
@@ -241,6 +243,10 @@ class MainClass(QMainWindow):
         if not self.start:
             self.play.setIcon(QtGui.QIcon("IMG/pause.ico"))
             self.count = self.playlist.currentIndex().row()
+
+            text = self.play_list[self.count + 1][0]
+            self.tray_icon.setToolTip(text)
+
             key = self.id[self.count]
             path_file = self.play_list[key][1]
             self.duration = self.play_list[key][2]
